@@ -131,23 +131,76 @@ Checkpoint 1: Applications expose to the public only via port 443 - Complete
 ```
 
 ### 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
-```2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
+```Checkpoint 2: Enable AWS Access and Ensure Least Privilege for Developers
+
 Verifying AWS access management for the team:
 Developers should have least privilege access (Read / Read-write / Root account).
 No need for Dev team to have access to AWS console.
+
+IAM Users:
+- user1
+  Permissions:
+  - Policy1
+  Belongs to Groups:
+  - Group1
+- user2
+  Permissions:
+  - Policy2
+  Belongs to Groups:
+  - Group2
+
+CloudTrail Status:
+CloudTrail is enabled.
+
+Recent CloudTrail Events:
+- event1: EventName1 (2024-04-17)
+- event2: EventName2 (2024-04-16)
+--------------------------------------------------
 ```
 
 ### 3.All traffic from end user should pass the Perimeter Security Solutions such as WAF and AWS Shield.
-```3.All traffic from end user should pass the Perimeter Security Solutions such as WAF and AWS Shield.
-Partially automating the check for association with WAF and AWS Shield.
-Please note: This function partially automates the process of checking if traffic from end users passes through Perimeter Security Solutions such as WAF and AWS Shield. It checks for associations with WAF and AWS Shield, but verifying if all traffic passes through them might require network configuration verification, which cannot be fully automated.
+```Checkpoint 3: Ensure All Traffic Passes through Perimeter Security Solutions
+
+Checking security solutions for all running instances...
+
+Checking instance i-1234567890...
+WAF is associated with instance i-1234567890.
+AWS Shield is associated with instance i-1234567890.
+
+Checking instance i-0987654321...
+WAF is not associated with instance i-0987654321.
+Do you want to configure WAF for this instance? (yes/no): yes
+WAF configured successfully for instance i-0987654321.
+AWS Shield is associated with instance i-0987654321.
+
+Recommendation:
+- Ensure all running instances have WAF and AWS Shield associated for perimeter security.
+
+--------------------------------------------------
 ```
 
 ### 4.Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.
-```4.Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.
-Checking security solutions...
-All Auto Scaling Groups are associated with load balancers.
-Recommendation: It ensure that all applications are configured to use horizontal load balancers (Auto scaling) to effectively handle surges in traffic and improve availability and scalability.
+Checkpoint 4: Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic
+```
+Checking load balancer associations for Auto Scaling Groups...
+Auto Scaling Groups not associated with load balancers:
+- Group1
+- Group2
+
+Do you want to configure a load balancer for these Auto Scaling Groups? (yes/no): yes
+Configuring load balancers...
+Adding load balancers to these Auto Scaling Groups can help distribute incoming traffic evenly across instances, improving application availability and fault tolerance.
+Steps to configure load balancers:
+1. Choose a suitable load balancer type (e.g., Application Load Balancer, Network Load Balancer).
+2. Create a new load balancer or select an existing one.
+3. Associate the load balancer with the Auto Scaling Group(s) that need to scale horizontally.
+4. Configure health checks to monitor the instances behind the load balancer.
+5. Optionally, set up listeners and routing rules to route traffic to the instances.
+6. Test the configuration to ensure that traffic is distributed properly.
+7. Monitor the load balancer and Auto Scaling Group performance regularly.
+
+Manual configuration is recommended for optimal customization and control.
+--------------------------------------------------
 ```
 
 ### 5.Check if application servers are installed with IPS/IDS and DDoS protection:
@@ -164,15 +217,22 @@ Recommendation: It ensure that all applications are configured to use horizontal
 
 ### 6.Check if Master-Slave architecture is set up for the database:
    ```
-   6.We should always have Master - Slave Architecture set up for DB.
 
-   Enter the database host: example.com
-   Enter the database port: 5432
-   Enter the database username: user
-   Enter the database password: ********
-   Enter the database name: dbname
-   The database type is: PostgreSQL
-   The database is configured as a Master in a Master-Slave setup.
+ 6. We should always have Master - Slave Architecture set up for DB.
+Enter the database host: [user input]
+Enter the database port: [user input]
+Enter the database username: [user input]
+Enter the database password: [user input]
+Enter the database name: [user input]
+The database type is: PostgreSQL
+The database is configured as a Master in a Master-Slave setup.
+
+Manual Verification:
+While this script can check for Master-Slave configuration, it's important to note that some configurations
+may not be accurately detected or may require additional context. For critical systems, it's recommended
+to manually review the database configuration or consult with a database administrator to ensure
+correctness and reliability.
+
    ```
 
 ### 7.Check if managed DB (RDS) is used:
