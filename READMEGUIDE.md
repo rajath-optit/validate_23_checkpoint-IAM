@@ -3,9 +3,8 @@
 
 ### pre-requisite
 1.Create a Bash script:
-```
 Create a new file, let's call it setup_dependencies.sh, and open it in a text editor.
-```
+
 ```
 nano setup_dependencies.sh
 ```
