@@ -141,7 +141,7 @@ All Auto Scaling Groups are associated with load balancers.
 Recommendation: It ensure that all applications are configured to use horizontal load balancers (Auto scaling) to effectively handle surges in traffic and improve availability and scalability.
 ```
 
-5. **Check if application servers are installed with IPS/IDS and DDoS protection:**
+### 5.Check if application servers are installed with IPS/IDS and DDoS protection:
    ```
    5.Application servers to be installed with IPS/IDS and DDoS (Examples for solution are - TrendMicro Deep Security).
 
@@ -153,7 +153,7 @@ Recommendation: It ensure that all applications are configured to use horizontal
    Suggestion: Consider installing and configuring IPS/IDS or DDoS protection solutions on the affected servers.
    ```
 
-6. **Check if Master-Slave architecture is set up for the database:**
+### 6.Check if Master-Slave architecture is set up for the database:
    ```
    6.We should always have Master - Slave Architecture set up for DB.
 
@@ -166,14 +166,14 @@ Recommendation: It ensure that all applications are configured to use horizontal
    The database is configured as a Master in a Master-Slave setup.
    ```
 
-7. **Check if managed DB (RDS) is used:**
+### 7.Check if managed DB (RDS) is used:
    ```
    7.We should always recommend to have Managed DB (Example : RDS).
 
    Managed databases (RDS instances) are being used.
    ```
    
-8. **Check if EBS volumes are encrypted:**
+### 8.Check if EBS volumes are encrypted:
    ```
    8.Encrypt all EBS volumes.
 
@@ -279,14 +279,12 @@ Security Group: Bastion-SG (sg-1234567890)
 SSH access to the Bastion Host is configured:
 Allowed from IP range: 10.0.0.0/16
 ```
-The output for each section would be as follows:
 
 ### 18.MFA (Multi-Factor Authentication) to be enabled for VPN access
 ```
 MFA is enabled for VPN access for IAM user: <username>
 MFA is not enabled for VPN access for IAM user: <username>
 ```
-*(This output indicates whether MFA is enabled for VPN access for each IAM user.)*
 
 ### 19.Back Up configuration is a must for all Prod resources. Get confirmation from the customer on Backup frequency and retention period.
 ```
@@ -295,7 +293,6 @@ Backup is not configured for EC2 instance: <instance_id>
 Automated backups are enabled for RDS instance: <db_instance_id>
 Automated backups are not enabled for RDS instance: <db_instance_id>
 ```
-*(This output indicates whether backup configurations are in place for EC2 instances and RDS instances.)*
 
 ### 20.All resources should be in connected to Monitoring tool with Customer approved Thresholds.
 ```
@@ -304,7 +301,6 @@ No CloudWatch alarms found for EC2 instance: <instance_id>
 CloudWatch alarms exist for RDS instance: <db_instance_id>
 No CloudWatch alarms found for RDS instance: <db_instance_id>
 ```
-*(This output indicates whether all resources are connected to a monitoring tool with customer-approved thresholds.)*
 
 ### 21.Have Monitoring tool covering all the critical instances, services, URL etc… Get confirmation from the customer on the coverage and alert recipients.
 ```
@@ -313,20 +309,15 @@ No CloudWatch alarms found for EC2 instance: <instance_id>
 CloudWatch alarms exist for RDS instance: <db_instance_id>
 No CloudWatch alarms found for RDS instance: <db_instance_id>
 ```
-*(This output indicates whether the monitoring tool covers all critical instances, services, URLs, etc.)*
 
 ### 22.Implement Log Aggregator tool covering all servers.
 ```
 Log group exists for EC2 instance: <instance_id>
 No log group found for EC2 instance: <instance_id>
 ```
-*(This output indicates whether a log aggregator tool is implemented covering all servers.)*
 
 ### 23.Log Aggregator is recommended to be in Prod VPC on a individual instance, else cost is on high side if outside of Prod VPC.
 ```
 Log aggregator is recommended to be in Prod VPC for instance: <instance_id>
 Log aggregator is not recommended to be in Prod VPC for instance: <instance_id>
 ```
-*(This output indicates whether a log aggregator is recommended to be in the production VPC on an individual instance.)*
-   
-   
