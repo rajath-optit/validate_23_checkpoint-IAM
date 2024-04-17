@@ -1,6 +1,53 @@
 ### instructions for users to use your Python scripts `IAM_policy.py` and `security23checks.py`:
 
-For `IAM_policy.py`:
+
+### pre-requisite
+1.Create a Bash script:
+```
+Create a new file, let's call it setup_dependencies.sh, and open it in a text editor.
+```
+```
+nano setup_dependencies.sh
+```
+
+Add the pip install commands:
+Inside the script, add the pip install commands for all the dependencies you need.
+```
+#!/bin/bash
+
+# Install psycopg2-binary
+pip3 install psycopg2-binary
+
+# If psycopg2-binary installation fails, try installing libpq-dev
+if [ $? -ne 0 ]; then
+    echo "Installation of psycopg2-binary failed. Installing libpq-dev..."
+    sudo apt-get update
+    sudo apt-get install -y libpq-dev
+    echo "Attempting to install psycopg2 again..."
+    pip3 install psycopg2
+fi
+
+# Install other dependencies
+pip3 install boto3
+pip3 install paramiko
+pip3 install mysql-connector-python
+pip3 install tabulate
+```
+3.Make the script executable:
+
+After saving the script, make it executable by running:
+```
+chmod +x setup_dependencies.sh
+```
+Run the script:
+
+Users can now run the script to install all the dependencies:
+```
+./setup_dependencies.sh
+```
+
+
+### For `IAM_policy.py`:
 
 1. **Save or Clone the File**:
    - Save `IAM_policy.py` to your local machine or clone the repository:
