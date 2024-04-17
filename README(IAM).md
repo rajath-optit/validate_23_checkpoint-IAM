@@ -4,6 +4,9 @@
 **Logging: The code includes logging statements to record the results of the analysis in a log file named aws_security_audit.log. This can be helpful for keeping track of the analysis results and any potential issues identified.**
 
 ** Printed Suggestions: The code also includes print statements to provide suggestions based on the analysis. These suggestions are aimed at improving the security posture of your AWS account by highlighting potential issues or areas for improvement.**
+
+#output will look like.
+
 ```
 High Importance Functions and their outputs:
 ╒═══════════════════════════╤═══════════════════════════════════════════════════════════════════════════════════════════════════
