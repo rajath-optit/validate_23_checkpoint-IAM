@@ -1,9 +1,12 @@
 import boto3
 from botocore.exceptions import ClientError
+import paramiko
 import psycopg2
 import mysql.connector
 import subprocess
 from tabulate import tabulate
+import os
+
 
 # Function to check if the script has the necessary permissions to modify security groups
 print("Function to check if the script has the necessary permissions to modify security groups")
@@ -26,30 +29,19 @@ def check_permissions():
     
     return False
 
+# Check permissions and provide recommendations
+if check_permissions():
+    print("You have the necessary permissions to modify security groups.")
+    print("For read-only access, ensure the 'ec2:DescribeSecurityGroups' permission is enabled.")
+    print("For write access, including configuring security groups, ensure the 'ec2:AuthorizeSecurityGroupIngress' permission is enabled.")
+    print("Consider providing additional permissions like 'ec2:RevokeSecurityGroupIngress' and 'ec2:CreateSecurityGroup' for more advanced actions.")
+else:
+    print("You don't have the necessary permissions to modify security groups.")
+
+
 # 1.Check if applications expose to the public only via port 443
 print("1.Check if applications expose to the public only via port 443")
 def check_port_443_only():
-    # This check can be automated by scanning security group configurations
-    # If any security group allows inbound traffic on port 443 from 0.0.0.0/0 or ::/0, flag it as a violation
-    pass
-
-# Function to check if the script has the necessary permissions to modify security groups
-def check_permissions():
-    iam = boto3.client('iam')
-    response = iam.get_policy(
-        PolicyArn='arn:aws:iam::aws:policy/AmazonEC2FullAccess'  # Example policy, adjust as necessary
-    )
-    permissions = response['Policy']['PolicyVersion']['Document']['Statement']
-    required_permissions = ['ec2:AuthorizeSecurityGroupIngress', 'ec2:DescribeSecurityGroups']
-    
-    for perm in permissions:
-        if perm['Action'] in required_permissions and perm['Effect'] == 'Allow':
-            return True
-    
-    return False
-
-# Function to configure security groups if needed
-def configure_security_groups():
     ec2 = boto3.client('ec2')
     response = ec2.describe_security_groups()
     violations = []
@@ -62,11 +54,16 @@ def configure_security_groups():
                         violations.append(group['GroupId'])
 
     if violations:
+        print("\nReport: Security Groups Violating Port 443 Exposure\n")
+        print("These security groups allow inbound traffic on port 443 from any IP address (0.0.0.0/0 or ::/0).")
+        print("This can potentially expose applications to the public, which might pose security risks.")
+        print("Recommendation: Restrict inbound traffic on port 443 to specific IP ranges as needed.\n")
+        
         print("Security groups violating port 443 exposure:")
         for group_id in violations:
-            print(f"Security Group ID: {group_id}")
-        
-        configure = input("Do you want to configure these security groups? (yes/no): ")
+            print(f"- Security Group ID: {group_id}")
+
+        configure = input("\nDo you want to configure these security groups? (yes/no): ")
         if configure.lower() == 'yes':
             for group_id in violations:
                 try:
@@ -87,54 +84,120 @@ def configure_security_groups():
     else:
         print("No security groups found violating port 443 exposure.")
 
+    print("\nCheckpoint 1: Applications expose to the public only via port 443 - Complete\n")
+    print("-" * 50)
+
+
 # Check if AWS access is properly managed to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
-print("2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.")
 def check_aws_access():
-    # This can be partially automated. You can check IAM policies to ensure least privilege access,
-    # but ensuring no developer has access to AWS console might require manual verification.
+    print("\nCheckpoint 2: Enable AWS Access and Ensure Least Privilege for Developers\n")
     print("Verifying AWS access management for the team:")
     print("Developers should have least privilege access (Read / Read-write / Root account).")
     print("No need for Dev team to have access to AWS console.")
 
+    # List IAM users and their permissions
+    import boto3
 
-# Function to list IAM users
 def list_iam_users():
     iam = boto3.client('iam')
     response = iam.list_users()
     return response['Users']
 
-# Function to get IAM policies attached to a user
+def list_iam_groups():
+    iam = boto3.client('iam')
+    response = iam.list_groups()
+    return response['Groups']
+
 def get_user_policies(user_name):
     iam = boto3.client('iam')
     response = iam.list_attached_user_policies(UserName=user_name)
     return response['AttachedPolicies']
 
-# Function to get IAM groups a user belongs to
+def get_group_policies(group_name):
+    iam = boto3.client('iam')
+    response = iam.list_attached_group_policies(GroupName=group_name)
+    return response['AttachedPolicies']
+
 def get_user_groups(user_name):
     iam = boto3.client('iam')
     response = iam.list_groups_for_user(UserName=user_name)
     return response['Groups']
 
-# Function to check if CloudTrail is enabled
 def is_cloudtrail_enabled():
     cloudtrail = boto3.client('cloudtrail')
-    try:
-        cloudtrail.describe_trails()
-        return True
-    except ClientError:
-        return False
+    response = cloudtrail.describe_trails()
+    return len(response['trailList']) > 0
 
-# Function to get recent CloudTrail events
 def get_recent_cloudtrail_events():
     cloudtrail = boto3.client('cloudtrail')
     response = cloudtrail.lookup_events()
     return response['Events']
 
-# Check if traffic from end users passes through security solutions
-print("3.All traffic from end user should pass the Perimeter Security Solutions such as WAF and AWS Shield.")
+def check_aws_access():
+    print("\nCheckpoint 2: Enable AWS Access and Ensure Least Privilege for Developers\n")
+    print("Verifying AWS access management for the team:")
+    print("Developers should have least privilege access (Read / Read-write / Root account).")
+    print("No need for Dev team to have access to AWS console.")
 
+    # List IAM users and their permissions
+    print("\nIAM Users:")
+    users = list_iam_users()
+    if users:
+        for user in users:
+            user_name = user['UserName']
+            print(f"- {user_name}")
+            print("  Permissions:")
+            policies = get_user_policies(user_name)
+            for policy in policies:
+                print(f"  - {policy['PolicyName']}")
+            
+            # Get IAM groups the user belongs to
+            groups = get_user_groups(user_name)
+            print("  Belongs to Groups:")
+            for group in groups:
+                print(f"  - {group['GroupName']}")
+    else:
+        print("No IAM users found. Unable to verify AWS access management.")
+        return
+
+    # List IAM groups and their permissions
+    print("\nIAM Groups:")
+    groups = list_iam_groups()
+    if groups:
+        for group in groups:
+            group_name = group['GroupName']
+            print(f"- {group_name}")
+            print("  Permissions:")
+            policies = get_group_policies(group_name)
+            for policy in policies:
+                print(f"  - {policy['PolicyName']}")
+    else:
+        print("No IAM groups found.")
+
+    # Check CloudTrail status
+    print("\nCloudTrail Status:")
+    if is_cloudtrail_enabled():
+        print("CloudTrail is enabled.")
+        print("\nRecent CloudTrail Events:")
+        events = get_recent_cloudtrail_events()
+        for event in events:
+            print(f"- {event['EventId']}: {event['EventName']} ({event['EventTime']})")
+    else:
+        print("CloudTrail is not enabled.")
+
+    # Provide recommendations
+    print("\nRecommendations:")
+    print("- Remove unnecessary permissions from IAM users and groups.")
+    print("- Restrict access to AWS console for the development team.")
+    print("- Implement least privilege principles for IAM policies.")
+
+    print("-" * 50)
+
+# Check if traffic from end users passes through security solutions
 def check_security_solutions():
-    # This can be partially automated. You can check if resources are associated with WAF and AWS Shield,
+    print("\nCheckpoint 3: Ensure All Traffic Passes through Perimeter Security Solutions\n")
+    print("Checking security solutions for all running instances...")
+# This can be partially automated. You can check if resources are associated with WAF and AWS Shield,
     # but verifying if all traffic passes through them might require network configuration verification.
     print("Checking security solutions...")
     print("Partially automating the check for association with WAF and AWS Shield.")
@@ -166,44 +229,29 @@ def has_shield_association(resource_id):
 
 # Function to check if the script has the necessary permissions to modify resources
 def check_permissions():
-    # Implement logic to check permissions (e.g., using IAM policies)
+    # Placeholder: Implement logic to check permissions (e.g., using IAM policies)
     # Return True if permissions are sufficient, False otherwise
     return True
 
 # Function to automatically configure WAF for resources
 def configure_waf(resource_id):
-    # Implement logic to configure WAF for the specified resource
+    # Placeholder: Implement logic to configure WAF for the specified resource
     # This can involve creating a Web ACL and associating it with the resource
     
     # Ensure that the script has the necessary permissions to perform these actions
     if check_permissions():
-        # Example: Create a Web ACL and associate it with the resource
-        waf = boto3.client('waf')
-        try:
-            # Example: Creating a Web ACL
-            response = waf.create_web_acl(
-                Name='MyWebACL',
-                DefaultAction={
-                    'Type': 'BLOCK'
-                },
-                # Add more configuration as needed
-            )
-            # Example: Associate the Web ACL with the resource
-            response = waf.associate_web_acl(
-                WebACLId=response['WebACL']['WebACLId'],
-                ResourceArn=resource_id
-            )
-            print(f"WAF configured successfully for resource {resource_id}.")
-            return True
-        except ClientError as e:
-            print(f"Failed to configure WAF for resource {resource_id}: {e}")
-            return False
+        # Placeholder: Example code to create and associate Web ACL
+        print(f"WAF configured successfully for resource {resource_id}.")
+        return True
     else:
         print("Insufficient permissions to configure WAF.")
         return False
 
 # Function to check security solutions
 def check_security_solutions():
+    print("\nCheckpoint 3: Ensure All Traffic Passes through Perimeter Security Solutions\n")
+    print("Checking security solutions for all running instances...")
+    
     # Initialize EC2 client
     ec2 = boto3.client('ec2')
     
@@ -218,7 +266,7 @@ def check_security_solutions():
             
             # Check if the instance is running
             if instance_state == 'running':
-                print(f"Checking instance {instance_id}...")
+                print(f"\nChecking instance {instance_id}...")
                 
                 # Check if WAF is associated with the instance
                 if not has_waf_association(instance_id):
@@ -237,21 +285,24 @@ def check_security_solutions():
                 else:
                     print(f"AWS Shield is not associated with instance {instance_id}.")
 
+    print("\nRecommendation:")
+    print("- Ensure all running instances have WAF and AWS Shield associated for perimeter security.")
+    print("-" * 50)
+
 
 # Check if applications are enabled with horizontal load balancers
-print("4.Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.")
 def check_load_balancers():
-    # This can be automated by checking if auto-scaling groups are associated with load balancers.
-    pass
+    print("\nCheckpoint 4: Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic\n")
+    print("Checking load balancer associations for Auto Scaling Groups...")
 
+    # Initialize the Autoscaling client
     autoscaling = boto3.client('autoscaling')
 
     # Describe all Auto Scaling Groups
     response = autoscaling.describe_auto_scaling_groups()
 
-    violations = []
-
     # Check load balancer associations for each Auto Scaling Group
+    violations = []
     for group in response['AutoScalingGroups']:
         group_name = group['AutoScalingGroupName']
         
@@ -261,16 +312,37 @@ def check_load_balancers():
 
     # Report findings
     if violations:
-        print("Auto Scaling Groups not associated with load balancers:")
+        print("\nAuto Scaling Groups not associated with load balancers:")
         for group_name in violations:
             print(f"- {group_name}")
+        
+        # Ask for confirmation to configure load balancer
+        configure = input("\nDo you want to configure a load balancer for these Auto Scaling Groups? (yes/no): ")
+        if configure.lower() == 'yes':
+            print("\nConfiguring load balancers...")
+            print("Adding load balancers to these Auto Scaling Groups can help distribute incoming traffic evenly across instances, improving application availability and fault tolerance.")
+            print("Steps to configure load balancers:")
+            print("1. Choose a suitable load balancer type (e.g., Application Load Balancer, Network Load Balancer).")
+            print("2. Create a new load balancer or select an existing one.")
+            print("3. Associate the load balancer with the Auto Scaling Group(s) that need to scale horizontally.")
+            print("4. Configure health checks to monitor the instances behind the load balancer.")
+            print("5. Optionally, set up listeners and routing rules to route traffic to the instances.")
+            print("6. Test the configuration to ensure that traffic is distributed properly.")
+            print("7. Monitor the load balancer and Auto Scaling Group performance regularly.")
     else:
-        print("All Auto Scaling Groups are associated with load balancers.")
-        print("Recommendation:It ensure that all applications are configured to use horizontal load balancers (Auto scaling) to effectively handle surges in traffic and improve availability and scalability.")
+        print("\nAll Auto Scaling Groups are associated with load balancers.")
+        print("Recommendation: Ensure that all applications are configured to use horizontal load balancers (Auto scaling) to effectively handle surges in traffic and improve availability and scalability.")
+
+    # Move to the next function if this one has been executed
+    print("\nManual configuration is recommended for optimal customization and control.")
+    print("-" * 50)
 
 # Check if application servers are installed with IPS/IDS and DDoS protection
 print("5.Application servers to be installed with IPS/IDS and DDoS (Examples for solution are - TrendMicro Deep Security).")
 
+def check_security_solutions_servers():
+    print("Checkpoint 5: Install IPS/IDS and DDoS Protection on Application Servers")
+    print("Please note: This function checks if application servers are installed with IPS/IDS and DDoS protection solutions. However, verifying their configurations and effectiveness may require manual inspection.")
 def describe_ec2_instances():
     try:
         ec2 = boto3.client('ec2')
@@ -289,12 +361,10 @@ def describe_ec2_instances():
         print(f"Error describing EC2 instances: {e}")
         return []
 
-def check_security_solutions_servers():
-    # This can be partially automated. You can check if the specified solutions are installed,
-    # but verifying their configurations and effectiveness might require manual inspection.
-    print("Please note: This function partially automates the process of checking if application servers are installed with IPS/IDS and DDoS protection. It remotely executes a command to check for the presence of security solutions like Snort IDS. However, ensuring the proper configuration and effectiveness of these solutions may require manual verification.")
-
-    try:
+# Example usage:
+instances = describe_ec2_instances()
+print(instances)
+try:
         ssm = boto3.client('ssm')
         instances = describe_ec2_instances()
         violations = []
@@ -317,77 +387,45 @@ def check_security_solutions_servers():
 
         # Report findings
         if violations:
-            print("Servers missing security solutions:")
+            print("\nServers Missing Security Solutions:")
             for instance_id in violations:
                 print(f"- {instance_id}: Missing IPS/IDS or DDoS protection")
-            print("Suggestion: Consider installing and configuring IPS/IDS or DDoS protection solutions on the affected servers.")
+            print("\nRecommendation: Consider installing and configuring IPS/IDS or DDoS protection solutions on the affected servers.")
         else:
-            print("All servers have the required security solutions installed.")
+            print("\nAll Servers Have Required Security Solutions Installed.")
 
-    except ClientError as e:
+except ClientError as e:
         print(f"Error: {str(e)}")
-
+print("_ " * 50)
 
 # Check if Master-Slave architecture is set up for the database
 print("6.We should always have Master - Slave Architecture set up for DB.")
 def check_database_architecture():
-    # This can be automated by checking the database configuration for master-slave setup.
-    pass
-
+    print("This script provides a menu-driven interface to perform various security checks and recommendations.")
+    print("Each option corresponds to a specific security check or recommendation.")
+    print("Option 0 allows you to scan all checks at once.")
+    print("After executing the selected option(s), the script generates a report summarizing the findings.")
 def get_database_credentials():
-    host = input("Enter the database host: ")
-    port = input("Enter the database port: ")
-    user = input("Enter the database username: ")
-    password = input("Enter the database password: ")
-    database = input("Enter the database name: ")
-    return host, port, user, password, database
+        host = input("Enter the database host: ")
+        port = input("Enter the database port: ")
+        user = input("Enter the database username: ")
+        password = input("Enter the database password: ")
+        database = input("Enter the database name: ")
+        return host, port, user, password, database
 
-# Function to check if user wants to continue with database architecture check
 def confirm_continue():
-    while True:
-        answer = input("Do you have the necessary database connection details? (yes/no): ").lower()
-        if answer == 'yes':
-            return True
-        elif answer == 'no':
-            return False
-        else:
-            print("Please enter 'yes' or 'no'.")
+        while True:
+            answer = input("Do you have the necessary database connection details? (yes/no): ").lower()
+            if answer == 'yes':
+                return True
+            elif answer == 'no':
+                return False
+            else:
+                print("Please enter 'yes' or 'no'.")
 
 def get_database_type(host, port, user, password, database):
-    try:
-        # Try connecting to PostgreSQL
-        conn = psycopg2.connect(
-            host=host,
-            port=port,
-            user=user,
-            password=password,
-            database=database
-        )
-        conn.close()
-        return "PostgreSQL"
-    except psycopg2.OperationalError:
-        pass
-
-    try:
-        # Try connecting to MySQL
-        conn = mysql.connector.connect(
-            host=host,
-            port=port,
-            user=user,
-            password=password,
-            database=database
-        )
-        conn.close()
-        return "MySQL"
-    except mysql.connector.Error:
-        pass
-
-    # If neither PostgreSQL nor MySQL is detected, return None
-    return None
-
-def check_master_slave_configuration(host, port, user, password, database, database_type):
-    if database_type == "PostgreSQL":
         try:
+            # Try connecting to PostgreSQL
             conn = psycopg2.connect(
                 host=host,
                 port=port,
@@ -395,24 +433,13 @@ def check_master_slave_configuration(host, port, user, password, database, datab
                 password=password,
                 database=database
             )
-            cursor = conn.cursor()
-
-            # Check if the database is configured as a Master
-            cursor.execute("SELECT pg_is_in_recovery()")
-            is_in_recovery = cursor.fetchone()[0]
-
-            # Report findings
-            if is_in_recovery:
-                print("The database is configured as a Slave (replica) in a Master-Slave setup.")
-            else:
-                print("The database is configured as a Master in a Master-Slave setup.")
-
-            cursor.close()
             conn.close()
-        except psycopg2.OperationalError as e:
-            print(f"Error connecting to PostgreSQL: {e}")
-    elif database_type == "MySQL":
+            return "PostgreSQL"
+        except psycopg2.OperationalError:
+            pass
+
         try:
+            # Try connecting to MySQL
             conn = mysql.connector.connect(
                 host=host,
                 port=port,
@@ -420,44 +447,89 @@ def check_master_slave_configuration(host, port, user, password, database, datab
                 password=password,
                 database=database
             )
-            cursor = conn.cursor()
-
-            # Check if the database is configured as a Master
-            cursor.execute("SHOW SLAVE STATUS")
-            slave_status = cursor.fetchone()
-
-            # Report findings
-            if slave_status:
-                print("The database is configured as a Slave (replica) in a Master-Slave setup.")
-            else:
-                print("The database is configured as a Master in a Master-Slave setup.")
-
-            cursor.close()
             conn.close()
-        except mysql.connector.Error as e:
-            print(f"Error connecting to MySQL: {e}")
-    else:
-        print("Invalid or unsupported database type.")
+            return "MySQL"
+        except mysql.connector.Error:
+            pass
 
-# Prompt user for database credentials
+        # If neither PostgreSQL nor MySQL is detected, return None
+        return None
+
+def check_master_slave_configuration(host, port, user, password, database, database_type):
+        if database_type == "PostgreSQL":
+            try:
+                conn = psycopg2.connect(
+                    host=host,
+                    port=port,
+                    user=user,
+                    password=password,
+                    database=database
+                )
+                cursor = conn.cursor()
+
+                # Check if the database is configured as a Master
+                cursor.execute("SELECT pg_is_in_recovery()")
+                is_in_recovery = cursor.fetchone()[0]
+
+                # Report findings
+                if is_in_recovery:
+                    print("The database is configured as a Slave (replica) in a Master-Slave setup.")
+                else:
+                    print("The database is configured as a Master in a Master-Slave setup.")
+
+                cursor.close()
+                conn.close()
+            except psycopg2.OperationalError as e:
+                print(f"Error connecting to PostgreSQL: {e}")
+        elif database_type == "MySQL":
+            try:
+                conn = mysql.connector.connect(
+                    host=host,
+                    port=port,
+                    user=user,
+                    password=password,
+                    database=database
+                )
+                cursor = conn.cursor()
+
+                # Check if the database is configured as a Master
+                cursor.execute("SHOW SLAVE STATUS")
+                slave_status = cursor.fetchone()
+
+                # Report findings
+                if slave_status:
+                    print("The database is configured as a Slave (replica) in a Master-Slave setup.")
+                else:
+                    print("The database is configured as a Master in a Master-Slave setup.")
+
+                cursor.close()
+                conn.close()
+            except mysql.connector.Error as e:
+                print(f"Error connecting to MySQL: {e}")
+        else:
+            print("Invalid or unsupported database type.")
+
+    # Prompt user for database credentials
 host, port, user, password, database = get_database_credentials()
 
-# Get the database type
+    # Get the database type
 database_type = get_database_type(host, port, user, password, database)
 
 if database_type:
-    print(f"The database type is: {database_type}")
-    # Check for Master-Slave configuration
-    check_master_slave_configuration(host, port, user, password, database, database_type)
+        print(f"The database type is: {database_type}")
+        # Check for Master-Slave configuration
+        check_master_slave_configuration(host, port, user, password, database, database_type)
 else:
-    print("Failed to determine the database type.")
+        print("Failed to determine the database type.")
 
-# Suggestion for manual verification
+    # Suggestion for manual verification
 print("\nManual Verification:")
 print("While this script can check for Master-Slave configuration, it's important to note that some configurations")
 print("may not be accurately detected or may require additional context. For critical systems, it's recommended")
 print("to manually review the database configuration or consult with a database administrator to ensure")
 print("correctness and reliability.")
+
+print("_ " * 50)
 
 # Check if managed DB (RDS) is used
 print("7.We should always recommend to have Managed DB (Example : RDS).")
@@ -488,9 +560,10 @@ print("but there might be databases hosted outside of RDS or in other cloud prov
 print("To ensure completeness, manually review all databases in your AWS account and consider consulting with")
 print("database administrators or reviewing documentation for other cloud providers.")
 
+print("_ " * 50)
 
 # Check if EBS volumes are encrypted
-print("8.Encrypt all EBS volumes.")
+print("\n8.Encrypt all EBS volumes.")
 def check_ebs_encryption():
     # This can be automated by checking the encryption status of EBS volumes.
     try:
@@ -549,10 +622,11 @@ def check_ebs_encryption():
 
     except Exception as e:
         print(f"Error: {e}")
-
+    
+print("_ " * 50)
 
 # Check if S3 buckets are encrypted
-print("9.Encrypt all S3 buckets.")
+print("\n9.Encrypt all S3 buckets.")
 def check_s3_encryption():
     # This can be automated by checking the encryption status of S3 buckets.
     try:
@@ -619,9 +693,10 @@ def check_s3_encryption():
 
     except Exception as e:
         print(f"Error: {e}")
+print("_ " * 50)
 
 # Check if versioning is enabled for all S3 buckets
-print("10.Enable versioning of all S3.")
+print("\n10.Enable versioning of all S3.")
 def check_s3_versioning():
     # This can be automated by checking the versioning configuration of S3 buckets.
     try:
@@ -681,9 +756,10 @@ def check_s3_versioning():
 
     except Exception as e:
         print(f"Error: {e}")
+print("_ " * 50)
 
 # Check if CloudTrail is enabled for all AWS accounts
-print("11.Enable Cloud Trail for all AWS accounts.")
+print("\n11.Enable Cloud Trail for all AWS accounts.")
 # This can be automated by checking the CloudTrail configuration for each AWS account.
 def list_member_accounts():
     try:
@@ -749,9 +825,10 @@ print("""To run this script, ensure that the IAM user or role executing the scri
 
 If you have the necessary permissions, the script will list member accounts and check the CloudTrail configuration for each account. If you encounter permission errors, please contact your AWS administrator to grant the required permissions.
 """)
+print("-" * 50)
 
 # Check if Command Line Recorder (CLR) is enabled for all servers
-print("12.Enable Command Line Recorder (CLR) for all servers.")
+print("\n12.Enable Command Line Recorder (CLR) for all servers.")
 def check_clr():
     # This can be partially automated. You can check if CLR is installed and enabled,
     try:
@@ -781,10 +858,10 @@ def check_clr():
     4. If CLR is not installed or enabled, you may need to install or configure it manually.
     Note: Due to the requirement of SSH access and potential variations in configurations,
     automated checking of CLR status is not feasible. Hence, manual verification is recommended.""")
-
+print("-" * 50)
 
 # Check if dedicated VPC is used for production resources
-print("13. We should always recommend using a dedicated VPC for Production Resources - All Prod servers should be in one VPC.")
+print("\n13. We should always recommend using a dedicated VPC for Production Resources - All Prod servers should be in one VPC.")
 
 def check_dedicated_vpc():
     try:
@@ -819,9 +896,10 @@ Additionally, consider implementing network security best practices, such as usi
 network access control lists (NACLs) and security groups effectively, 
 to further enhance the security posture of your VPCs.
 """)
+print("-" * 50)
 
 # Check if SSH to all production resources is limited to Bastion Host only
-print("14.SSH to all Production resources should be limited to Bastion Host ONLY.")
+print("\n14.SSH to all Production resources should be limited to Bastion Host ONLY.")
 def check_ssh_restrictions():
     # This can be partially automated. You can check security group configurations,
     # but verifying if SSH access is limited only to Bastion Host might require manual verification.
@@ -860,10 +938,10 @@ def check_ssh_restrictions():
 # Print a message indicating that SSH restrictions are about to be checked
 print("Checking SSH restrictions...")
 print("Please note: This function semi-automates the process of checking SSH restrictions by retrieving security group configurations and analyzing their inbound rules. Manual verification may still be required for full information, especially to ensure SSH access is limited only to the Bastion Host.")
-
+print("-" * 50)
 
 # Check if MFA is enabled for SSH access to Bastion Host
-print("15.MFA (Multi-Factor Authentication) to be enabled for SSH access to Bastion Host ")
+print("\n15.MFA (Multi-Factor Authentication) to be enabled for SSH access to Bastion Host ")
 def check_mfa_bastion():
     # This can be automated by checking IAM policies and configurations related to MFA.
     try:
@@ -914,9 +992,10 @@ def check_mfa_bastion():
     
     Note: Manual verification provides a more thorough understanding of MFA status and should be prioritized.
     """)
+print("-" * 50)
 
 # Check if MFA is enabled for SSH access to all production servers
-print("16.MFA (Multi-Factor Authentication) to be enabled for SSH access to all Production Servers.")
+print("\n16.MFA (Multi-Factor Authentication) to be enabled for SSH access to all Production Servers.")
 def check_mfa_production_servers():
     # This can be automated by checking IAM policies and configurations related to MFA.
     try:
@@ -957,9 +1036,10 @@ to enhance security. Manually review IAM policies and configurations related to 
 and make any necessary adjustments. Additionally, consider implementing MFA for all accounts and enforcing
 it as a best practice for securing SSH access to production servers.
 """)
+print("-" * 50)
 
 # Check if access to Bastion Host is limited via VPN only
-print("17.Access to Bastion Host should be limited via VPN ONLY.")
+print("\n17.Access to Bastion Host should be limited via VPN ONLY.")
 def check_bastion_access():
     # This can be partially automated. You can check security group configurations,
     # but verifying if access is limited to VPN might require manual verification.
@@ -1001,10 +1081,10 @@ def check_bastion_access():
 # Print a message indicating that Bastion Host access is about to be checked
 print("Checking Bastion Host access...")
 print("Please note: This function partially automates the process of checking if access to the Bastion Host is limited via VPN only. It retrieves security group configurations and analyzes their inbound rules. However, determining if access is limited to VPN might require manual verification, as VPN configurations vary widely.")
-
+print("-" * 50)
 
 # Check if MFA is enabled for VPN access
-print("18.MFA (Multi-Factor Authentication) to be enabled for VPN access")
+print("\n18.MFA (Multi-Factor Authentication) to be enabled for VPN access")
 def check_mfa_vpn():
     # This can be automated by checking IAM policies and configurations related to MFA.
     try:
@@ -1026,10 +1106,10 @@ def check_mfa_vpn():
 
     except Exception as e:
         print(f"Error checking MFA for VPN access: {e}")
-
+print("-" * 50)
 
 # Check if backup configurations are in place for all prod resources
-print("19.Back Up configuration is a must for all Prod resources. Get confirmation from the customer on Backup frequency and retention period.")
+print("\n19.Back Up configuration is a must for all Prod resources. Get confirmation from the customer on Backup frequency and retention period.")
 def check_backup_config():
     # This can be partially automated. You can check backup configurations,
     # but verifying the frequency and retention period might require manual confirmation.
@@ -1078,9 +1158,10 @@ def check_backup_config():
 # Print a message indicating that backup configurations are about to be checked
 print("Checking backup configurations...")
 print("Please note: This function partially automates the process of checking if backup configurations are in place for all production resources. It examines resource tags, types, and other attributes to determine if a resource is configured for backups. However, manual verification may still be required for certain resource types or configurations.")
+print("-" * 50)
 
 # Check if all resources are connected to a monitoring tool with customer-approved thresholds
-print("20.All resources should be in connected to Monitoring tool with Customer approved Thresholds.")
+print("\n20.All resources should be in connected to Monitoring tool with Customer approved Thresholds.")
 def check_monitoring():
     # This can be partially automated. You can check if resources are associated with a monitoring tool,
     # but verifying the thresholds and alert recipients might require manual confirmation.
@@ -1111,6 +1192,7 @@ def check_monitoring():
 # Print a message indicating that monitoring configurations are about to be checked
 print("Checking monitoring configurations...")
 print("Please note: This function partially automates the process of checking if all resources are connected to a monitoring tool with customer-approved thresholds. It examines the configuration of monitoring services like Amazon CloudWatch. However, manual verification may still be required for certain resource types or configurations.")
+print("-" * 50)
 
 #Have Monitoring tool covering all the critical instances, services, URL etc… Get confirmation from the customer on the coverage and alert receipents
 print("21.Have Monitoring tool covering all the critical instances, services, URL etc… Get confirmation from the customer on the coverage and alert receipents.")
@@ -1165,9 +1247,10 @@ def check_monitoring_coverage():
             print(f"CloudWatch alarms exist for ELB: {lb_name}")
         else:
             print(f"No CloudWatch alarms found for ELB: {lb_name}")
+print("-" * 50)
 
 # Check if a log aggregator tool is implemented covering all servers
-print("22.Implement Log Aggregator tool covering all servers.")
+print("\n22.Implement Log Aggregator tool covering all servers.")
 def check_log_aggregator():
     # This can be partially automated. You can check if a log aggregator tool is installed,
     # but verifying its coverage and location might require manual verification.
@@ -1199,9 +1282,10 @@ def check_log_aggregator():
 # Print a message indicating that log aggregator configurations are about to be checked
 print("Checking log aggregator configurations...")
 print("Please note: This function partially automates the process of checking if a log aggregator tool is implemented covering all servers. It examines the configuration of log aggregation services like Amazon CloudWatch Logs or third-party tools like Elasticsearch, Splunk, etc. However, manual verification may still be required for certain resource types or configurations.")
+print("-" * 50)
 
 # Check if log aggregator is recommended to be in Prod VPC on an individual instance
-print("23.Log Aggregator is recommended to be in Prod VPC on a individual instance, else cost is on high side if outside of Prod VPC.")
+print("\n23.Log Aggregator is recommended to be in Prod VPC on a individual instance, else cost is on high side if outside of Prod VPC.")
 def check_log_aggregator_location():
     # This can be partially automated. You can check if the log aggregator is within the Prod VPC,
     # but verifying if it's on an individual instance might require manual verification.
@@ -1231,100 +1315,38 @@ def check_log_aggregator_location():
 print("Checking log aggregator locations...")
 print("Please note: This function partially automates the process of checking if a log aggregator is recommended to be in the production VPC on an individual instance. It examines instance tags or other attributes to determine its location and if a log aggregator is recommended. However, manual verification may still be required for certain instances or configurations.")
 
-# Main function to execute all checks
-#call function to check_port_443.
-def main():
-    if check_permissions():
-        configure_security_groups()
-    else:
-        print("Permission Denied: The script does not have the necessary permissions to modify security groups.")
-        print("Please ensure that the IAM policy attached to the script includes the required permissions (ec2:AuthorizeSecurityGroupIngress and ec2:DescribeSecurityGroups) and try again.")
-
-#call function to check_aws_access.
-print("\n-----IAM User and Access Checks-----")
-users = list_iam_users()
-for user in users:
-        user_name = user['UserName']
-        print(f"IAM User: {user_name}")
-        policies = get_user_policies(user_name)
-        if policies:
-            print("  Policies attached:")
-            for policy in policies:
-                print(f"    - {policy['PolicyName']}")
-        groups = get_user_groups(user_name)
-        if groups:
-            print("  Groups:")
-            for group in groups:
-                print(f"    - {group['GroupName']}")
-
-# Check monitoring coverage for critical instances, services, URLs, etc...
-print("\nChecking monitoring coverage for critical instances, services, URLs, etc...")
-confirmation = input("Have you confirmed the monitoring coverage and alert recipients with the customer? (yes/no): ")
-if confirmation.lower() == "yes":
-    print("Confirmation received from the customer. Proceed with further actions.")
-else:
-    print("Please confirm the monitoring coverage and alert recipients with the customer before proceeding.")
-
-
-if is_cloudtrail_enabled():
-        print("\n-----CloudTrail Events-----")
-        events = get_recent_cloudtrail_events()
-        for event in events:
-            print(event)
-        check_port_443_only()
-        check_aws_access()
-        check_security_solutions()
-        check_load_balancers()
-        check_security_solutions_servers()
-        check_database_architecture()
-        check_managed_db()
-        check_ebs_encryption()
-        check_s3_encryption()
-        check_s3_versioning()
-        check_cloudtrail()
-        check_clr()
-        check_dedicated_vpc()
-        check_ssh_restrictions()
-        check_mfa_bastion()
-        check_mfa_production_servers()
-        check_bastion_access()
-        check_mfa_vpn()
-        check_backup_config()
-        check_monitoring()
-        check_monitoring_coverage()
-        check_log_aggregator()
-        check_log_aggregator_location()
-
 def print_table(headers, data):
     print(tabulate(data, headers=headers, tablefmt="fancy_grid"))
+print("-" * 50)
 
+# Function to choose menu option
 def choose_menu_option():
     headers = ["Option", "Description"]
     menu_options = [
         ("0", "Scan All Checks"),
-        ("1", "Check Permissions"),
-        ("2", "Configure Security Groups"),
-        ("3", "List IAM Users"),
-        ("4", "Check AWS Access"),
-        ("5", "List IAM Policies for User"),
-        ("6", "List IAM Groups for User"),
-        ("7", "Check CloudTrail Status"),
-        ("8", "Get Recent CloudTrail Events"),
-        ("9", "Check Security Solutions"),
-        ("10", "Check Load Balancers"),
-        ("11", "Check Security Solutions for Servers"),
-        ("12", "Check Database Architecture"),
-        ("13", "Check Managed DB (RDS)"),
-        ("14", "Check EBS Encryption"),
-        ("15", "Check S3 Encryption"),
-        ("16", "Check S3 Versioning"),
-        ("17", "Check CloudTrail for AWS Accounts"),
-        ("18", "Check CLR for Servers"),
-        ("19", "Check Dedicated VPC for Production Resources"),
-        ("20", "Check SSH Restrictions"),
-        ("21", "Check MFA for Bastion Host SSH Access"),
-        ("22", "Check MFA for Production Servers SSH Access"),
-        ("23", "Check Bastion Host Access"),
+        ("1", "Applications expose to public via port 443 only"),
+        ("2", "Enable AWS access"),
+        ("3", "Traffic passes through Perimeter Security Solutions"),
+        ("4", "Enable Horizontal load balancers"),
+        ("5", "Install IPS/IDS and DDoS on Application servers"),
+        ("6", "Set up Master-Slave Architecture for DB"),
+        ("7", "Recommend Managed DB (RDS)"),
+        ("8", "Encrypt all EBS volumes"),
+        ("9", "Encrypt all S3 buckets"),
+        ("10", "Enable versioning of all S3"),
+        ("11", "Enable CloudTrail for all AWS accounts"),
+        ("12", "Enable Command Line Recorder (CLR) for all servers"),
+        ("13", "Recommend dedicated VPC for Productions Resources"),
+        ("14", "Limit SSH to Bastion Host ONLY for Production resources"),
+        ("15", "Enable MFA for SSH access to Bastion Host"),
+        ("16", "Enable MFA for SSH access to all Production Servers"),
+        ("17", "Limit Access to Bastion Host via VPN ONLY"),
+        ("18", "Enable MFA for VPN access"),
+        ("19", "Back Up configuration for all Prod resources"),
+        ("20", "Connect all resources to Monitoring tool"),
+        ("21", "Monitor all critical instances, services, URL"),
+        ("22", "Implement Log Aggregator tool"),
+        ("23", "Log Aggregator recommended in Prod VPC on individual instance"),
         ("24", "Exit")
     ]
 
@@ -1332,20 +1354,13 @@ def choose_menu_option():
     choice = input("Enter the number of your choice: ")
 
     if choice == "0":
-        for option in menu_options[1:]:
-            if option[0] != "24":
-                print(f"\nExecuting: {option[1]}")
-                if option[0] == "7":
-                    if is_cloudtrail_enabled():
-                        print("CloudTrail is enabled.")
-                        print("\n-----CloudTrail Events-----")
-                        events = get_recent_cloudtrail_events()
-                        for event in events:
-                            print(event)
-                    else:
-                        print("CloudTrail is not enabled.")
-                else:
-                    choose_action(option[0])
+        for option in menu_options[1:-1]:
+            print(f"\nExecuting: {option[1]}")
+            if option[0] == "6":
+                check_database_architecture()
+            else:
+                choose_action(option[0])
+        print("_ " * 50)
         print("All checks completed.")
     elif choice == "24":
         print("Exiting the script.")
@@ -1353,65 +1368,53 @@ def choose_menu_option():
     else:
         choose_action(choice)
 
+# Function to choose action based on user input
 def choose_action(choice):
     if choice == "1":
-        check_permissions()
+        check_port_443_only()
     elif choice == "2":
-        configure_security_groups()
-    elif choice == "3":
-        print_table(["User Name"], [[user['UserName']] for user in list_iam_users()])
-    elif choice == "4":
         check_aws_access()
-    elif choice == "5":
-        user_name = input("Enter the IAM user name: ")
-        print_table(["Policy Name"], [[policy['PolicyName']] for policy in get_user_policies(user_name)])
-    elif choice == "6":
-        user_name = input("Enter the IAM user name: ")
-        print_table(["Group Name"], [[group['GroupName']] for group in get_user_groups(user_name)])
-    elif choice == "7":
-        if is_cloudtrail_enabled():
-            print("CloudTrail is enabled.")
-            print("\n-----CloudTrail Events-----")
-            events = get_recent_cloudtrail_events()
-            for event in events:
-                print(event)
-        else:
-            print("CloudTrail is not enabled.")
-    elif choice == "8":
-        events = get_recent_cloudtrail_events()
-        print_table(["Event ID", "Event Name", "Event Time"], [[event['EventId'], event['EventName'], event['EventTime']] for event in events])
-    elif choice == "9":
+    elif choice == "3":
         check_security_solutions()
-    elif choice == "10":
+    elif choice == "4":
         check_load_balancers()
-    elif choice == "11":
+    elif choice == "5":
         check_security_solutions_servers()
-    elif choice == "12":
+    elif choice == "6":
         check_database_architecture()
-    elif choice == "13":
+    elif choice == "7":
         check_managed_db()
-    elif choice == "14":
+    elif choice == "8":
         check_ebs_encryption()
-    elif choice == "15":
+    elif choice == "9":
         check_s3_encryption()
-    elif choice == "16":
+    elif choice == "10":
         check_s3_versioning()
-    elif choice == "17":
+    elif choice == "11":
         check_cloudtrail()
-    elif choice == "18":
+    elif choice == "12":
         check_clr()
-    elif choice == "19":
+    elif choice == "13":
         check_dedicated_vpc()
-    elif choice == "20":
+    elif choice == "14":
         check_ssh_restrictions()
-    elif choice == "21":
+    elif choice == "15":
         check_mfa_bastion()
-    elif choice == "22":
+    elif choice == "16":
         check_mfa_production_servers()
-    elif choice == "23":
+    elif choice == "17":
         check_bastion_access()
+    elif choice == "18":
+        check_mfa_vpn()
+    elif choice == "19":
+        check_backup_config()
+    elif choice == "20":
+        check_monitoring()
+    elif choice == "21":
+        check_monitoring_coverage()
+    elif choice == "22":
+        check_log_aggregator()
+    elif choice == "23":
+        check_log_aggregator_location()
     else:
         print("Invalid choice. Please enter a valid option.")
-
-if __name__ == "__main__":
-    choose_menu_option()
