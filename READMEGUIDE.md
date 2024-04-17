@@ -46,6 +46,8 @@ Users can now run the script to install all the dependencies:
 ```
 
 
+# -------- step to execute script ------
+
 ### For `IAM_policy.py`:
 
 1. **Save or Clone the File**:
