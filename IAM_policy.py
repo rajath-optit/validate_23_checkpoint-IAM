@@ -1,6 +1,19 @@
 import boto3
 import botocore
 import logging
+from tabulate import tabulate
+
+print("# Ensure that the IAM credentials you use to execute this code have sufficient permissions")
+print("# to perform the necessary actions like listing users, policies, roles, etc.")
+print("# IAM API functions used in the code.\n")
+
+print("# Logging: The code includes logging statements to record the results of the analysis")
+print("# in a log file named aws_security_audit.log. This can be helpful for keeping track")
+print("# of the analysis results and any potential issues identified.\n")
+
+print("# Printed Suggestions: The code also includes print statements to provide suggestions")
+print("# based on the analysis. These suggestions are aimed at improving the security posture")
+print("# of your AWS account by highlighting potential issues or areas for improvement.\n")
 
 # Initialize IAM client
 iam = boto3.client('iam')
@@ -48,7 +61,8 @@ def enforce_least_privilege():
                 log_result(f"Policy {policy_name} allows excessive permissions.")
                 print(f"Suggestion: Review the policy '{policy_name}' for least privilege and restrict permissions to the minimum required for tasks.")
                 break  # No need to check further statements for this policy
-
+        else:
+            print(f"Suggestion: Policy '{policy_name}' follows least privilege principles.")
 
 def review_iam_policy_conditions():
     # Review IAM policies for conditions
@@ -258,46 +272,6 @@ def review_iam_role_session_policies():
         if not session_policy_enforces_least_privilege(session_policy):
             print(f"Suggestion: Session policy for IAM role '{role_name}' may not enforce least privilege.")
 
-def review_iam_policy_wildcard_usage():
-    # Analyze IAM policies for the use of wildcards (*) to avoid unintended permissions and potential security risks
-    response = iam.list_policies(Scope='Local')
-    policies = response['Policies']
-    for policy in policies:
-        policy_name = policy['PolicyName']
-        response = iam.get_policy(PolicyArn=policy['Arn'])
-        policy_document = response['Policy']['DefaultVersionId']
-        # Add logic to analyze policy document for wildcard usage
-        if wildcard_usage_is_detected(policy_document):
-            print(f"Suggestion: Policy '{policy_name}' uses wildcards (*) which may lead to unintended permissions and potential security risks.")
-
-def review_iam_group_membership():
-    # Check IAM group memberships to ensure users are assigned to appropriate groups and have necessary permissions
-    response = iam.list_groups()
-    groups = response['Groups']
-    for group in groups:
-        group_name = group['GroupName']
-        response = iam.get_group(GroupName=group_name)
-        users = response['Users']
-        # Add logic to analyze group membership
-        if not group_membership_is_appropriate(users):
-            print(f"Suggestion: IAM group '{group_name}' membership should be reviewed to ensure users have necessary permissions.")
-
-def review_iam_role_policies_resource_specific():
-    # Verify IAM role policies for resource-specific permissions to ensure they are scoped appropriately
-    response = iam.list_roles()
-    roles = response['Roles']
-    for role in roles:
-        role_name = role['RoleName']
-        response = iam.list_attached_role_policies(RoleName=role_name)
-        attached_policies = response['AttachedPolicies']
-        for policy in attached_policies:
-            policy_name = policy['PolicyName']
-            response = iam.get_policy(PolicyArn=policy['PolicyArn'])
-            policy_document = response['Policy']['DefaultVersionId']
-            # Add logic to analyze policy document for resource-specific permissions
-            if not resource_specific_permissions_are_scoped_appropriately(policy_document):
-                print(f"Suggestion: IAM role '{role_name}' has policies with resource-specific permissions that may not be scoped appropriately.")
-
 def review_iam_policy_expiration_dates():
     # Check IAM policy expiration dates to ensure policies are reviewed and renewed before expiration
     response = iam.list_policies(Scope='Local')
@@ -311,14 +285,6 @@ def review_iam_policy_expiration_dates():
         # Add logic to analyze policy creation date and determine expiration dates
         if not policy_expiration_date_is_set(create_date):
             print(f"Suggestion: Policy '{policy_name}' does not have an expiration date set.")
-
-def enforce_password_policy():
-    # Ensure IAM password policy is enforced
-    response = iam.get_account_password_policy()
-    password_policy = response['PasswordPolicy']
-    if not password_policy['AllowUsersToChangePassword'] or not password_policy['MinimumPasswordLength']:
-        log_result("IAM password policy is not properly enforced.")
-        print("Suggestion: Consider enforcing a password policy that requires users to change their passwords periodically and sets a minimum password length.")
 
 @handle_api_exceptions
 def enforce_least_privilege():
@@ -335,14 +301,11 @@ def enforce_least_privilege():
             print(f"Suggestion: Review the policy '{policy_name}' for least privilege and restrict permissions to the minimum required for tasks.")
         else:
             log_result(f"Policy {policy_name} analyzed for least privilege.")
-
-# Code omitted for brevity...
-
+            # Add suggestion if not already present
+            print(f"No suggestion needed: Policy '{policy_name}' enforces least privilege.")
 @handle_api_exceptions
 def enforce_iam_permission_boundaries():
     # Ensure IAM permission boundaries are properly configured
-    response = iam.list_users()
-    users = response
     response = iam.list_users()
     users = response['Users']
     for user in users:
@@ -352,6 +315,10 @@ def enforce_iam_permission_boundaries():
         if not attached_policies:
             log_result(f"IAM User '{username}' does not have any permission boundaries set.")
             print(f"Suggestion: Consider setting IAM permission boundaries for user '{username}' to restrict permissions within defined limits.")
+        else:
+            log_result(f"IAM User '{username}' has permission boundaries set.")
+            # Add suggestion if not already present
+            print(f"No suggestion needed: Permission boundaries are set for user '{username}'.")
 
 @handle_api_exceptions
 def review_iam_role_assumption_session_policies():
@@ -365,6 +332,9 @@ def review_iam_role_assumption_session_policies():
         # Add logic to review assume role policy document
         if not assume_role_policy_enforces_least_privilege(trust_policy):
             print(f"Suggestion: Review the assume role policy for IAM role '{role_name}' to ensure it enforces least privilege and restricts access appropriately.")
+        else:
+            # Add suggestion if not already present
+            print(f"No suggestion needed: Assume role policy for IAM role '{role_name}' enforces least privilege.")
 
 @handle_api_exceptions
 def simulate_iam_policy():
@@ -375,6 +345,9 @@ def simulate_iam_policy():
         if result['EvalDecision'] == 'Deny':
             log_result("IAM policy simulation indicates a potential denial.")
             print("Suggestion: Perform IAM policy simulation regularly to identify potential denial scenarios and adjust policies accordingly.")
+        else:
+            # Add suggestion if not already present
+            print("No suggestion needed: IAM policy simulation did not indicate any potential denial.")
 
 @handle_api_exceptions
 def analyze_iam_credential_report():
@@ -384,6 +357,9 @@ def analyze_iam_credential_report():
         report = iam.get_credential_report()
         # Add logic to analyze credential report
         print("Suggestion: Analyze IAM credential report regularly to identify security risks such as unused credentials and take appropriate actions.")
+    else:
+        # Add suggestion if not already present
+        print("No suggestion needed: IAM credential report generation is not yet complete.")
 
 @handle_api_exceptions
 def review_iam_cross_account_access():
@@ -397,69 +373,248 @@ def review_iam_cross_account_access():
         # Add logic to review role policies for cross-account access
         if not cross_account_access_is_limited(role_policies):
             print(f"Suggestion: Review policies attached to IAM role '{role_name}' to ensure cross-account access is limited to trusted entities.")
+        else:
+            # Add suggestion if not already present
+            print(f"No suggestion needed: Cross-account access for IAM role '{role_name}' is limited to trusted entities.")
+
+@handle_api_exceptions
+def review_iam_access_keys_rotation():
+    # Review IAM access keys rotation
+    response = iam.list_users()
+    users = response['Users']
+    for user in users:
+        username = user['UserName']
+        response = iam.list_access_keys(UserName=username)
+        access_keys = response['AccessKeyMetadata']
+        for key in access_keys:
+            key_id = key['AccessKeyId']
+            create_date = key['CreateDate']
+            if access_key_rotation_needed(create_date):
+                print(f"Suggestion: IAM user '{username}' access key '{key_id}' rotation is needed to minimize unauthorized access.")
+            else:
+                print(f"No suggestion needed: IAM user '{username}' access key '{key_id}' is rotated regularly.")
+
+@handle_api_exceptions
+def review_iam_groups_configuration():
+    # Review IAM groups configuration
+    response = iam.list_groups()
+    groups = response['Groups']
+    for group in groups:
+        group_name = group['GroupName']
+        response = iam.get_group(GroupName=group_name)
+        users = response['Users']
+        # Add logic to analyze group membership and configuration
+        if not group_configuration_is_appropriate(users):
+            print(f"Suggestion: Review IAM group '{group_name}' configuration to ensure users are assigned to appropriate groups based on their roles and responsibilities.")
+
+@handle_api_exceptions
+def review_iam_roles_sensitive_permissions():
+    # Review IAM roles for sensitive permissions
+    response = iam.list_roles()
+    roles = response['Roles']
+    for role in roles:
+        role_name = role['RoleName']
+        if role_has_sensitive_permissions(role_name):
+            print(f"Suggestion: IAM role '{role_name}' has sensitive permissions. Ensure proper monitoring and auditing are in place.")
+        else:
+            print(f"No suggestion needed: IAM role '{role_name}' does not have sensitive permissions.")
+
+@handle_api_exceptions
+def review_iam_role_policies_resource_tagging():
+    # Review IAM role policies for resource tagging enforcement
+    response = iam.list_roles()
+    roles = response['Roles']
+    for role in roles:
+        role_name = role['RoleName']
+        if role_policy_enforces_resource_tagging(role_name):
+            print(f"No suggestion needed: IAM role '{role_name}' policy enforces resource tagging.")
+        else:
+            print(f"Suggestion: Review IAM role '{role_name}' policies to ensure enforcement of resource tagging policies.")
+
+@handle_api_exceptions
+def review_iam_policies_unused_permissions():
+    # Review IAM policies for unused permissions
+    response = iam.list_policies(Scope='Local')
+    policies = response['Policies']
+    for policy in policies:
+        policy_name = policy['PolicyName']
+        if unused_permissions_exist(policy_name):
+            print(f"Suggestion: IAM policy '{policy_name}' contains unused permissions. Remove them to reduce the attack surface.")
+        else:
+            print(f"No suggestion needed: IAM policy '{policy_name}' does not contain unused permissions.")
+
+@handle_api_exceptions
+def review_iam_policy_versioning():
+    # Review IAM policy versioning
+    response = iam.list_policies(Scope='Local')
+    policies = response['Policies']
+    for policy in policies:
+        policy_name = policy['PolicyName']
+        if policy_versioning_needs_cleanup(policy_name):
+            print(f"Suggestion: Review IAM policy '{policy_name}' versioning to retain only necessary versions.")
+        else:
+            print(f"No suggestion needed: IAM policy '{policy_name}' versioning is appropriately managed.")
+
+@handle_api_exceptions
+def review_iam_role_permission_boundaries():
+    # Review IAM role permission boundaries
+    response = iam.list_roles()
+    roles = response['Roles']
+    for role in roles:
+        role_name = role['RoleName']
+        if permission_boundaries_are_inappropriate(role_name):
+            print(f"Suggestion: Review IAM role '{role_name}' permission boundaries to ensure they are properly configured.")
+        else:
+            print(f"No suggestion needed: IAM role '{role_name}' permission boundaries are properly configured.")
+
+@handle_api_exceptions
+def review_iam_user_mfa_status():
+    # Review IAM user MFA status
+    response = iam.list_users()
+    users = response['Users']
+    for user in users:
+        username = user['UserName']
+        if mfa_enabled_for_user(username):
+            print(f"No suggestion needed: MFA is enabled for IAM user '{username}'.")
+        else:
+            print(f"Suggestion: Enable MFA for IAM user '{username}' to enhance security.")
+
+@handle_api_exceptions
+def review_iam_policies_privilege_escalation():
+    # Review IAM policies for privilege escalation paths
+    response = iam.list_policies(Scope='Local')
+    policies = response['Policies']
+    for policy in policies:
+        policy_name = policy['PolicyName']
+        if privilege_escalation_paths_exist(policy_name):
+            print(f"Suggestion: Analyze IAM policy '{policy_name}' for potential privilege escalation paths.")
+        else:
+            print(f"No suggestion needed: IAM policy '{policy_name}' does not contain privilege escalation paths.")
+
+@handle_api_exceptions
+def review_iam_role_trust_relationships():
+    # Review IAM role trust relationships
+    response = iam.list_roles()
+    roles = response['Roles']
+    for role in roles:
+        role_name = role['RoleName']
+        if trust_relationships_need_review(role_name):
+            print(f"Suggestion: Review trust relationships for IAM role '{role_name}' to ensure only trusted entities can assume the role.")
+        else:
+            print(f"No suggestion needed: Trust relationships for IAM role '{role_name}' are appropriately configured.")
+
+@handle_api_exceptions
+def review_iam_policy_conditions():
+    # Review IAM policy conditions
+    response = iam.list_policies(Scope='Local')
+    policies = response['Policies']
+    for policy in policies:
+        policy_name = policy['PolicyName']
+        if policy_conditions_need_review(policy_name):
+            print(f"Suggestion: Review IAM policy '{policy_name}' conditions to further restrict access based on contextual factors.")
+        else:
+            print(f"No suggestion needed: IAM policy '{policy_name}' conditions are appropriately configured.")
+
+@handle_api_exceptions
+def review_iam_user_permissions_change_history():
+    # Review IAM user permissions change history
+    response = iam.generate_service_last_accessed_details()
+    if response['JobStatus'] == 'COMPLETED':
+        # Retrieve last accessed details for IAM users
+        users_last_accessed = iam.get_service_last_accessed_details()
+        for user_details in users_last_accessed['ServicesLastAccessed']:
+            user_name = user_details['ServiceName']
+            last_accessed_timestamp = user_details['LastAuthenticated']
+            if last_accessed_timestamp:
+                print(f"IAM User '{user_name}' was last accessed on {last_accessed_timestamp}.")
+            else:
+                print(f"Suggestion: IAM User '{user_name}' has never been accessed.")
+    else:
+        print("No suggestion needed: Retrieval of IAM user last accessed details is not yet complete.")
 
 
-
-def main():
-    # Call each review function
-    enforce_password_policy()
-    enforce_least_privilege()
-    use_iam_roles_for_ec2()
-    ensure_unique_credentials()
-    enable_mfa()
-    manage_iam_access_keys()
-    rotate_access_keys()
-    review_iam_policies()
-    review_iam_role_trust_policies()
-    enforce_iam_permission_boundaries()
-    review_iam_role_assumption_session_policies()
-    simulate_iam_policy()
-    analyze_iam_credential_report()
-    review_iam_cross_account_access()
-    review_iam_service_linked_roles()
-    review_iam_user_last_activity()
-    review_iam_policy_versioning()
-    use_iam_access_advisor()
-    review_iam_policy_cross_account_usage()
-    review_iam_policy_expiration_dates()
-    review_iam_role_session_duration()
-    review_iam_role_inline_policies()
-    review_iam_role_policy_size()
-    review_iam_policy_wildcard_usage()
-    review_iam_group_membership()
-    review_iam_role_policies_resource_specific()
-    review_iam_policy_conditions()
-    review_iam_password_policy_complexity()
-    review_iam_user_inline_policies()
-    review_iam_role_trust_relationships()
-    review_iam_user_permissions_boundaries()
-    review_iam_policy_expiration_dates()
-    review_iam_role_session_policies()
-    review_iam_policy_size()
-    review_unused_iam_permissions()
-    review_iam_password_policy_expiration()
-    review_iam_user_last_activity()
-    review_iam_cross_account_access()
-    review_iam_service_linked_roles()
-    review_unused_iam_permissions()
-    review_iam_password_policy_complexity()
-    review_iam_user_inline_policies()
-    review_iam_role_trust_relationships()
-    review_iam_user_permissions_boundaries()
-    review_iam_policy_size()
-    review_iam_role_session_policies()
-    review_iam_policy_wildcard_usage()
-    review_iam_group_membership()
-    review_iam_role_policies_resource_specific()
-    review_iam_policy_expiration_dates()
-    enforce_password_policy()
-    enforce_least_privilege()
-    enforce_iam_permission_boundaries()
-    review_iam_role_assumption_session_policies()
-    simulate_iam_policy()
-    analyze_iam_credential_report()
-    review_iam_cross_account_access()
+# Define the function to print a table
+def print_table(headers, data):
+    print(tabulate(data, headers=headers, tablefmt="fancy_grid"))
 
 
-if __name__ == "__main__":
-    main()
+# High Importance Functions with their outputs
+high_importance_functions = [
+    ("enforce_least_privilege", enforce_least_privilege()),
+    ("enforce_password_policy", enforce_password_policy()),
+    ("review_iam_password_policy_complexity", review_iam_password_policy_complexity()),
+    ("review_iam_role_trust_relationships", review_iam_role_trust_relationships()),
+    ("review_iam_user_inline_policies", review_iam_user_inline_policies()),
+    ("review_unused_iam_permissions", review_unused_iam_permissions()),
+    ("review_iam_policy_expiration_dates", review_iam_policy_expiration_dates()),
+    ("review_iam_role_session_policies", review_iam_role_session_policies()),
+    ("review_iam_policy_size", review_iam_policy_size()),
+    ("review_iam_service_linked_roles", review_iam_service_linked_roles()),
+    ("review_iam_policy_wildcard_usage", review_iam_policy_wildcard_usage()),
+    ("review_iam_group_membership", review_iam_group_membership()),
+    ("review_iam_role_policies_resource_specific", review_iam_role_policies_resource_specific()),
+    ("review_iam_user_permissions_boundaries", review_iam_user_permissions_boundaries()),
+    ("review_iam_role_session_policies", review_iam_role_session_policies())
+]
+
+# Present the options
+print("High Importance Functions and their outputs:")
+
+# Display the selected table
+print_table(["Function Name", "Function Output"], high_importance_functions)
+
+# Medium Importance Functions with their outputs
+medium_importance_functions = [
+    ("simulate_iam_policy", simulate_iam_policy()),
+    ("analyze_iam_credential_report", analyze_iam_credential_report()),
+    ("review_iam_cross_account_access", review_iam_cross_account_access()),
+    ("review_iam_access_keys_rotation", review_iam_access_keys_rotation()),
+    ("review_iam_groups_configuration", review_iam_groups_configuration()),
+    ("review_iam_roles_sensitive_permissions", review_iam_roles_sensitive_permissions()),
+    ("review_iam_role_policies_resource_tagging", review_iam_role_policies_resource_tagging()),
+    ("review_iam_policies_unused_permissions", review_iam_policies_unused_permissions()),
+    ("review_iam_policy_versioning", review_iam_policy_versioning()),
+    ("review_iam_role_permission_boundaries", review_iam_role_permission_boundaries()),
+    ("review_iam_user_mfa_status", review_iam_user_mfa_status()),
+    ("review_iam_policies_privilege_escalation", review_iam_policies_privilege_escalation()),
+    ("review_iam_role_trust_relationships", review_iam_role_trust_relationships()),
+    ("review_iam_policy_conditions", review_iam_policy_conditions()),
+    ("review_iam_user_permissions_change_history", review_iam_user_permissions_change_history())
+]
+
+# Present the options
+print("Medium Importance Functions and their outputs:")
+
+# Display the selected table
+print_table(["Function Name", "Function Output"], medium_importance_functions)
+
+# Low Importance Functions with their outputs
+low_importance_functions = [
+    ("handle_api_exceptions", handle_api_exceptions),
+    ("log_result", log_result)
+]
+
+print("\nLow Importance Functions and their outputs:")
+
+# Display the selected table
+print_table(["Function Name", "Function Output"], low_importance_functions)
+
+
+# Present the options for selecting a table
+print("Please select an option to view the corresponding table:")
+print("1. High Importance Functions")
+print("2. Medium Importance Functions")
+print("3. Low Importance Functions")
+
+# Get user input
+option = input("Enter your choice (1, 2, or 3): ")
+
+# Display the selected table
+if option == "1":
+    print_table(["High Importance Functions"], [[func[0]] for func in high_importance_functions])
+elif option == "2":
+    print_table(["Medium Importance Functions"], [[func[0]] for func in medium_importance_functions])
+elif option == "3":
+    print_table(["Low Importance Functions"], [[func[0]] for func in low_importance_functions])
+else:
+    print("Invalid option. Please select 1, 2, or 3.")
