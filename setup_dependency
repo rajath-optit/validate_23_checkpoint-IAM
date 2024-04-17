@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Install psycopg2-binary
+pip3 install psycopg2-binary
+
+# If psycopg2-binary installation fails, try installing libpq-dev
+if [ $? -ne 0 ]; then
+    echo "Installation of psycopg2-binary failed. Installing libpq-dev..."
+    sudo apt-get update
+    sudo apt-get install -y libpq-dev
+    echo "Attempting to install psycopg2 again..."
+    pip3 install psycopg2
+fi
+
+# Install other dependencies
+pip3 install boto3
+pip3 install paramiko
+pip3 install mysql-connector-python
+pip3 install tabulate
