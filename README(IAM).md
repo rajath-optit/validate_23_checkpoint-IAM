@@ -1,5 +1,5 @@
 
-# Ensure that the IAM credentials you use to execute this code have sufficient permissions
+** Ensure that the IAM credentials you use to execute this code have sufficient permissions **
 # to perform the necessary actions like listing users, policies, roles, etc.
 # IAM API functions used in the code.
 
