@@ -109,7 +109,9 @@ OUTPUT
 
 
 ON CHOOSING 
+```
 
+### 1.Check if applications expose to the public only via port 443
 ```1.Check if applications expose to the public only via port 443
 Security groups violating port 443 exposure:
 Security Group ID: sg-1234567890
@@ -119,22 +121,22 @@ Security group sg-1234567890 configured successfully.
 Security group sg-0987654321 configured successfully.
 ```
 
-```### 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
-
+### 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
+```2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
 Verifying AWS access management for the team:
 Developers should have least privilege access (Read / Read-write / Root account).
 No need for Dev team to have access to AWS console.
 ```
 
 ### 3.All traffic from end user should pass the Perimeter Security Solutions such as WAF and AWS Shield.
-```
-Checking security solutions...
+```3.All traffic from end user should pass the Perimeter Security Solutions such as WAF and AWS Shield.
 Partially automating the check for association with WAF and AWS Shield.
 Please note: This function partially automates the process of checking if traffic from end users passes through Perimeter Security Solutions such as WAF and AWS Shield. It checks for associations with WAF and AWS Shield, but verifying if all traffic passes through them might require network configuration verification, which cannot be fully automated.
 ```
 
 ### 4.Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.
-```
+```4.Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.
+Checking security solutions...
 All Auto Scaling Groups are associated with load balancers.
 Recommendation: It ensure that all applications are configured to use horizontal load balancers (Auto scaling) to effectively handle surges in traffic and improve availability and scalability.
 ```
@@ -192,7 +194,7 @@ Recommendation: It ensure that all applications are configured to use horizontal
    ```
 The output for each function will depend on the specific conditions encountered in the AWS environment. Here's how the output might look like for each function:
 
-### Function: Check if S3 buckets are encrypted
+### 9.Function: Check if S3 buckets are encrypted
 ```
 9.Encrypt all S3 buckets.
 Encrypted S3 buckets found:
@@ -212,7 +214,7 @@ at rest. It is essential for maintaining the confidentiality and integrity of
 your data.
 ```
 
-### Function: Check if versioning is enabled for all S3 buckets
+### 10.Function: Check if versioning is enabled for all S3 buckets
 ```
 10.Enable versioning of all S3.
 S3 buckets with versioning enabled:
@@ -231,7 +233,7 @@ of an object in the bucket. This helps protect against accidental deletion
 or modification of objects, providing a backup mechanism for data recovery.
 ```
 
-### Function: Check if CloudTrail is enabled for all AWS accounts
+### 11.Function: Check if CloudTrail is enabled for all AWS accounts
 ```
 11.Enable Cloud Trail for all AWS accounts.
 Checking CloudTrail status for AWS account 123456789012...
@@ -240,13 +242,13 @@ Checking CloudTrail status for AWS account 234567890123...
 CloudTrail is not enabled for this account.
 ```
 
-### Function: Check if dedicated VPC is used for production resources
+### 13.Function: Check if dedicated VPC is used for production resources
 ```
 13. We should always recommend using a dedicated VPC for Production Resources - All Prod servers should be in one VPC.
 Dedicated VPC (VpcId: vpc-1234567890) is used for production resources.
 ```
 
-### Function: Check if SSH to all production resources is limited to Bastion Host only
+### 14.Function: Check if SSH to all production resources is limited to Bastion Host only
 ```
 14.SSH to all Production resources should be limited to Bastion Host ONLY.
 Security Group: Bastion-SG (sg-1234567890)
@@ -254,21 +256,21 @@ SSH access is configured:
    - Allowed from IP range: 10.0.0.0/16
 ```
 
-### Function: Check if MFA is enabled for SSH access to Bastion Host
+### 15.Function: Check if MFA is enabled for SSH access to Bastion Host
 ```
 15.MFA (Multi-Factor Authentication) to be enabled for SSH access to Bastion Host 
 MFA is enabled for SSH access to Bastion Host for IAM user: example_user
 MFA is not enabled for SSH access to Bastion Host for IAM role: example_role
 ```
 
-### Function: Check if MFA is enabled for SSH access to all production servers
+### 16.Function: Check if MFA is enabled for SSH access to all production servers
 ```
 16.MFA (Multi-Factor Authentication) to be enabled for SSH access to all Production Servers.
 MFA is enabled for SSH access to production server for IAM user: example_user
 MFA is not enabled for SSH access to production server for IAM role: example_role
 ```
 
-### Function: Check if access to Bastion Host is limited via VPN only
+### 17.Function: Check if access to Bastion Host is limited via VPN only
 ```
 17.Access to Bastion Host should be limited via VPN ONLY.
 Checking Bastion Host access...
