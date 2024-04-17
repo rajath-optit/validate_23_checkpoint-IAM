@@ -1,4 +1,5 @@
 Checks
+
 1.Applications should expose to public via port 443 only.
 
 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
@@ -109,8 +110,7 @@ OUTPUT
 
 ON CHOOSING 
 
-```
-###1.Check if applications expose to the public only via port 443
+```1.Check if applications expose to the public only via port 443
 Security groups violating port 443 exposure:
 Security Group ID: sg-1234567890
 Security Group ID: sg-0987654321
@@ -118,8 +118,9 @@ Do you want to configure these security groups? (yes/no): yes
 Security group sg-1234567890 configured successfully.
 Security group sg-0987654321 configured successfully.
 ```
-### 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
-```
+
+```### 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
+
 Verifying AWS access management for the team:
 Developers should have least privilege access (Read / Read-write / Root account).
 No need for Dev team to have access to AWS console.
