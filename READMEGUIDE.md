@@ -31,7 +31,6 @@ pip3 install boto3
 pip3 install paramiko
 pip3 install mysql-connector-python
 pip3 install tabulate
-pip install os
 ```
 3.Make the script executable:
 
