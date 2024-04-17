@@ -1,6 +1,5 @@
 import boto3
 from botocore.exceptions import ClientError
-import paramiko
 import psycopg2
 import mysql.connector
 import subprocess
