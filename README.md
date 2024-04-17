@@ -106,19 +106,28 @@ OUTPUT
 ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 │ Enter the number of your choice: 
 ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-ON CHOOSING 
 ```
 
+ON CHOOSING 
+
 ### 1.Check if applications expose to the public only via port 443
-```1.Check if applications expose to the public only via port 443
+Report: Security Groups Violating Port 443 Exposure
+```
+These security groups allow inbound traffic on port 443 from any IP address (0.0.0.0/0 or ::/0).
+This can potentially expose applications to the public, which might pose security risks.
+Recommendation: Restrict inbound traffic on port 443 to specific IP ranges as needed.
+
 Security groups violating port 443 exposure:
-Security Group ID: sg-1234567890
-Security Group ID: sg-0987654321
+- Security Group ID: sg-1234567890
+- Security Group ID: sg-0987654321
+
 Do you want to configure these security groups? (yes/no): yes
+
 Security group sg-1234567890 configured successfully.
 Security group sg-0987654321 configured successfully.
+
+Checkpoint 1: Applications expose to the public only via port 443 - Complete
+------------------------------------------------checkpoint 1---------------------------------------------
 ```
 
 ### 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.
