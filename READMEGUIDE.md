@@ -38,7 +38,7 @@ After saving the script, make it executable by running:
 ```
 chmod +x setup_dependencies.sh
 ```
-Run the script:
+4.Run the script:
 
 Users can now run the script to install all the dependencies:
 ```
