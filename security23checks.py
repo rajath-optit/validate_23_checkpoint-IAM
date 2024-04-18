@@ -7,47 +7,6 @@ import subprocess
 from tabulate import tabulate
 import os
 
-
-# Function to check if the script has the necessary permissions to modify security groups
-print("Function to check if the script has the necessary permissions to modify security groups")
-
-def check_permissions():
-    """
-    Check if the script has the necessary permissions to modify security groups.
-    This function checks if the IAM policy attached to the script includes the required permissions.
-    """
-    iam = boto3.client('iam')
-    try:
-        response = iam.get_policy(
-            PolicyArn='arn:aws:iam::aws:policy/AmazonEC2FullAccess'  # Example policy, adjust as necessary
-        )
-        policy_version = response['Policy']['DefaultVersionId']
-        response = iam.get_policy_version(PolicyArn=response['Policy']['Arn'], VersionId=policy_version)
-        permissions = response['PolicyVersion']['Document']['Statement']
-        
-        required_permissions = ['ec2:AuthorizeSecurityGroupIngress', 'ec2:DescribeSecurityGroups']
-        
-        for perm in permissions:
-            if perm['Action'] in required_permissions and perm['Effect'] == 'Allow':
-                return True
-    
-    except KeyError as e:
-        print(f"KeyError: {e}")
-        return False
-    
-    return False
-
-
-# Check permissions and provide recommendations
-if check_permissions():
-    print("You have the necessary permissions to modify security groups.")
-    print("For read-only access, ensure the 'ec2:DescribeSecurityGroups' permission is enabled.")
-    print("For write access, including configuring security groups, ensure the 'ec2:AuthorizeSecurityGroupIngress' permission is enabled.")
-    print("Consider providing additional permissions like 'ec2:RevokeSecurityGroupIngress' and 'ec2:CreateSecurityGroup' for more advanced actions.")
-else:
-    print("You don't have the necessary permissions to modify security groups.")
-
-
 # 1.Check if applications expose to the public only via port 443
 print("1.Check if applications expose to the public only via port 443")
 def check_port_443_only():
