@@ -17,17 +17,26 @@ def check_permissions():
     This function checks if the IAM policy attached to the script includes the required permissions.
     """
     iam = boto3.client('iam')
-    response = iam.get_policy(
-        PolicyArn='arn:aws:iam::aws:policy/AmazonEC2FullAccess'  # Example policy, adjust as necessary
-    )
-    permissions = response['Policy']['PolicyVersion']['Document']['Statement']
-    required_permissions = ['ec2:AuthorizeSecurityGroupIngress', 'ec2:DescribeSecurityGroups']
+    try:
+        response = iam.get_policy(
+            PolicyArn='arn:aws:iam::aws:policy/AmazonEC2FullAccess'  # Example policy, adjust as necessary
+        )
+        policy_version = response['Policy']['DefaultVersionId']
+        response = iam.get_policy_version(PolicyArn=response['Policy']['Arn'], VersionId=policy_version)
+        permissions = response['PolicyVersion']['Document']['Statement']
+        
+        required_permissions = ['ec2:AuthorizeSecurityGroupIngress', 'ec2:DescribeSecurityGroups']
+        
+        for perm in permissions:
+            if perm['Action'] in required_permissions and perm['Effect'] == 'Allow':
+                return True
     
-    for perm in permissions:
-        if perm['Action'] in required_permissions and perm['Effect'] == 'Allow':
-            return True
+    except KeyError as e:
+        print(f"KeyError: {e}")
+        return False
     
     return False
+
 
 # Check permissions and provide recommendations
 if check_permissions():
