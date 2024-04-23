@@ -39,8 +39,6 @@
                                                                                           14.  Encryption of Data in Transit and At Rest  
                                                                                           15.  Runtime Environment Patching and Updates  
 
-These headings outline key security considerations when working with AWS Lambda functions, covering various aspects such as access control, data protection, and operational security.      
-                                                                                      
    - Amazon ECS (Elastic Container Service)
    - AWS Batch
    - AWS Elastic Beanstalk
