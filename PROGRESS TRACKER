@@ -14,10 +14,10 @@
                                                                                           7. Operating System Updates ------------->DONE
                                                                                           8. Backup and Disaster Recovery ------------->DONE
                                                                                           9. Monitoring and Logging Implementation ------------->DONE
-                                                                                          10. Anti-Malware and Intrusion Detection ------------->DONE
-                                                                                          11. VPC Peering and VPN Configuration ------------->DONE
+                                                                                          10. Anti-Malware and Intrusion Detection 
+                                                                                          11. VPC Peering and VPN Configuration 
                                                                                           12. SSH Key Management Practices ------------->DONE
-                                                                                          13. File Integrity Monitoring ------------->DONE
+                                                                                          13. File Integrity Monitoring 
                                                                                           14. Automated Remediation Actions ------------->DONE
                                                                                           15. Third-Party Security Tools Integration ------------->DONE
 
