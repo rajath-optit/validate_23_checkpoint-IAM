@@ -1,0 +1,91 @@
+#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
+
+#23 CHECKPOINT PROVIDED HAS BEEN AUTOMATED ----------> DONE
+
+1. Compute Services:
+   - Amazon EC2 (Elastic Compute Cloud) ----------> WILL BE OVER SOON
+                                                                                          CHECKPOINTS
+                                                                                          1. Security Group Configuration ------------->DONE
+                                                                                          2. Network ACLs Setup ------------->DONE
+                                                                                          3. IAM Roles and Policies Review ------------->DONE
+                                                                                          4. Instance Metadata Service Protection ------------->DONE
+                                                                                          5. Data Encryption ------------->DONE
+                                                                                          6. Optimized Instance Types ------------->DONE
+                                                                                          7. Operating System Updates ------------->DONE
+                                                                                          8. Backup and Disaster Recovery ------------->DONE
+                                                                                          9. Monitoring and Logging Implementation ------------->DONE
+                                                                                          10. Anti-Malware and Intrusion Detection ------------->DONE
+                                                                                          11. VPC Peering and VPN Configuration ------------->DONE
+                                                                                          12. SSH Key Management Practices ------------->DONE
+                                                                                          13. File Integrity Monitoring ------------->DONE
+                                                                                          14. Automated Remediation Actions ------------->DONE
+                                                                                          15. Third-Party Security Tools Integration ------------->DONE
+
+   - AWS Lambda
+                                                                                          CHECKPOINTS
+                                                                                          1.   Function Execution Permissions  
+                                                                                          2.   Least Privilege Principle  
+                                                                                          3.   VPC Configuration and Isolation  
+                                                                                          4.   Environment Variable Security  
+                                                                                          5.   Code Signing and Integrity  
+                                                                                          6.   Monitoring and Logging Setup  
+                                                                                          7.   Concurrency and Throttling Controls  
+                                                                                          8.   Error Handling and Exception Management  
+                                                                                          9.   Cold Start Optimization  
+                                                                                          10.  Dependency Vulnerability Scanning  
+                                                                                          11.  Secure Deployment Pipelines  
+                                                                                          12.  Resource Limits and Timeout Settings  
+                                                                                          13.  Access Control via API Gateway  
+                                                                                          14.  Encryption of Data in Transit and At Rest  
+                                                                                          15.  Runtime Environment Patching and Updates  
+
+These headings outline key security considerations when working with AWS Lambda functions, covering various aspects such as access control, data protection, and operational security.      
+                                                                                      
+   - Amazon ECS (Elastic Container Service)
+   - AWS Batch
+   - AWS Elastic Beanstalk
+
+2. Storage Services:
+   - Amazon S3 (Simple Storage Service)
+                                                                                          CHECKPOINTS
+                                                                                          1.   Bucket Access Control Policies  
+                                                                                          2.   Cross-Origin Resource Sharing (CORS) Configuration  
+                                                                                          3.   Bucket Logging and Monitoring  
+                                                                                          4.   Server-Side Encryption Settings  
+                                                                                          5.   Object Versioning and MFA Delete  
+                                                                                          6.   Bucket Policy Permissions  
+                                                                                          7.   Lifecycle Policies for Object Expiration  
+                                                                                          8.   Secure Access Logging Configuration  
+                                                                                          9.   Bucket Policy Conditions  
+                                                                                          10.   Public Access Block Settings  
+                                                                                          11.   Bucket Replication Configuration  
+                                                                                          12.   Event Notifications and Event Triggers  
+                                                                                          13.   Data Transfer Encryption  
+                                                                                          14.   Access Control via Bucket Policies vs. IAM Policies  
+                                                                                          15.   Bucket Tagging for Resource Management                                                                              
+   - Amazon EBS (Elastic Block Store)
+   - Amazon EFS (Elastic File System)
+   - AWS Glacier
+   - AWS Storage Gateway
+
+3. Database Services:
+   - Amazon RDS (Relational Database Service)
+   - Amazon DynamoDB
+   - Amazon Redshift
+   - Amazon Aurora
+   - Amazon ElastiCache
+
+4. Networking Services:
+   - Amazon VPC (Virtual Private Cloud)
+   - Amazon Route 53
+   - AWS Direct Connect
+   - Amazon CloudFront
+   - AWS Global Accelerator
+
+5. Security, Identity, and Compliance:
+   - AWS IAM (Identity and Access Management)
+   - AWS KMS (Key Management Service)
+   - AWS Secrets Manager
+   - Amazon GuardDuty
+   - AWS WAF (Web Application Firewall)
+
