@@ -87,3 +87,59 @@
    - Amazon GuardDuty
    - AWS WAF (Web Application Firewall)
 
+
+
+import boto3
+
+def check_network_acl_configurations():
+    # Initialize the AWS EC2 client
+    ec2_client = boto3.client('ec2')
+
+    # Retrieve all network ACLs
+    response = ec2_client.describe_network_acls()
+
+    # Print the header for the table
+    print("=" * 97)
+    print("| {:<20} | {:<12} | {:<12} | {:<8} | {:<11} | {:<15} | {:<7} |".format(
+        "Network ACL ID", "Default ACL", "Rule Number", "Protocol", "Port Range", "CIDR Block", "Action"
+    ))
+    print("=" * 97)
+
+    # Iterate over each network ACL
+    for acl in response['NetworkAcls']:
+        acl_id = acl['NetworkAclId']
+        is_default = acl['IsDefault']
+
+        # Iterate over each entry in the network ACL
+        for entry in acl['Entries']:
+            rule_number = entry['RuleNumber']
+            protocol = entry['Protocol']
+            port_range = f"{entry.get('PortRange', {}).get('From', 'N/A')} - {entry.get('PortRange', {}).get('To', 'N/A')}"
+            cidr_block = entry['CidrBlock']
+            action = entry['RuleAction']
+
+            # Print the entry details
+            print("| {:<20} | {:<12} | {:<12} | {:<8} | {:<11} | {:<15} | {:<7} |".format(
+                acl_id, "Yes" if is_default else "No", rule_number, protocol, port_range, cidr_block, action
+            ))
+
+    # Print the bottom border of the table
+    print("=" * 97)
+
+if __name__ == "__main__":
+    print("Network ACLs Configuration:")
+    check_network_acl_configurations()
+
+
+output:
+
+Network ACLs Configuration:
+=================================================================================================
+| Network ACL ID       | Default ACL | Rule Number | Protocol | Port Range | CIDR Block     | Action |
+=================================================================================================
+| acl-1234567890abcdef0 | No          | 100         | TCP      | 80 - 80    | 0.0.0.0/0      | Allow  |
+|                       |             | 200         | TCP      | 443 - 443  | 0.0.0.0/0      | Allow  |
+-------------------------------------------------------------------------------------------------
+| acl-0987654321fedcba0 | Yes         | 100         | All      | N/A - N/A  | 0.0.0.0/0      | Allow  |
+|                       |             | 32767       | All      | N/A - N/A  | 0.0.0.0/0      | Deny   |
+=================================================================================================
