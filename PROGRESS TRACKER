@@ -1,4 +1,4 @@
-#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
+am#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
 
 #23 CHECKPOINT PROVIDED HAS BEEN AUTOMATED ----------> DONE
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     check_network_acl_configurations()
 
 
-output:
+example output:
 
 Network ACLs Configuration:
 =================================================================================================
