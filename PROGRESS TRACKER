@@ -1,3 +1,24 @@
+1. IAM Checkpoints:
+   Total Checkpoints: 14 (High Importance Functions) + 15 (Medium Importance Functions) = 29
+
+2. 23 Checkpoints Provided:
+   Total Checkpoints: 23
+
+3. Compute Services (Amazon EC2, AWS Lambda, Amazon ECS, AWS Batch, AWS Elastic Beanstalk): 
+   Total Checkpoints: 15 + 15 = 30
+
+4. Storage Services (Amazon S3, Amazon EBS, Amazon EFS, AWS Glacier, AWS Storage Gateway):
+   Total Checkpoints: 15 + 10 + 10 + 10 + 10 = 55
+
+5. Database Services (Amazon RDS, Amazon DynamoDB, Amazon Redshift, Amazon Aurora, Amazon ElastiCache):
+   Total Checkpoints: 10 + 10 + 10 + 10 + 10 = 50
+
+6. Networking Services (Amazon VPC, Amazon Route 53, AWS Direct Connect, Amazon CloudFront, AWS Global Accelerator):
+   Total Checkpoints: 10 + 10 + 10 + 10 + 10 = 50
+
+29 (IAM Checkpoints) + 23 (23 Provided Checkpoints) + 30 (Compute Services) + 55 (Storage Services) + 50 (Database Services) + 50 (Networking Services) = 237 checkpoints.
+
+
 #IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
 
 High Importance Functions:
