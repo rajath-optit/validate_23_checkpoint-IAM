@@ -55,3 +55,12 @@ API Gateway: Manages APIs and integrates with other services.
 DynamoDB: Stores data.
 Amazon Route 53: Handles DNS routing.
 
+Architecture Components:
+
+Front-end Python Web Application: Serves dynamic content.
+Static Assets: HTML, CSS, and JavaScript files stored in an Amazon S3 bucket.
+Amazon CloudFront: Content Delivery Network (CDN) delivering content via HTTP/HTTPS, with origin fetch from the S3 bucket or an Amazon EC2 instance.
+Application Logic: Handled by either AWS Lambda or an AWS Elastic Beanstalk environment.
+Data Storage: Amazon DynamoDB, a NoSQL database service.
+API Gateway: Manages API access and integration with other services, facilitating data integration and processing.
+Amazon Route 53: DNS service routing traffic to the appropriate endpoints.
