@@ -40,8 +40,44 @@ am#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
                                                                                           15.  Runtime Environment Patching and Updates  
 
    - Amazon ECS (Elastic Container Service)
+For Amazon ECS:
+1. Container Image Security Scanning
+2. Task Definition Permissions
+3. Cluster Access Controls
+4. Container Instance Security Groups
+5. IAM Roles for ECS Tasks
+6. Container Logging Configuration
+7. Container Network Configuration
+8. Encryption of Data in Transit and at Rest
+9. Container Health Checks
+10. Auto Scaling Policies for ECS Services
+
    - AWS Batch
+For AWS Batch:
+1. IAM Roles and Policies for Batch Jobs
+2. Security Group Configuration for Batch Compute Environments
+3. Network Access Controls for Batch Jobs
+4. Encryption of Data Used in Batch Jobs
+5. Configuration of Batch Job Logs
+6. Resource Limits and Quotas
+7. Compliance with Service Limits
+8. Monitoring of Batch Job Execution
+9. Patch Management for Compute Environments
+10. Automation of Job Cleanup and Termination
+
    - AWS Elastic Beanstalk
+For AWS Elastic Beanstalk:
+1. Secure Application Deployment Practices
+2. Environment Configuration Security
+3. IAM Roles for Elastic Beanstalk Environments
+4. Secure Communication between Resources
+5. Log Collection and Analysis
+6. Encryption of Data at Rest and in Transit
+7. Auto Scaling Policies and Limits
+8. Monitoring and Alerting Configuration
+9. Environment Update Policies
+10. Patch Management for OS and Frameworks
+
 
 2. Storage Services:
    - Amazon S3 (Simple Storage Service)
@@ -61,24 +97,180 @@ am#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
                                                                                           13.   Data Transfer Encryption  
                                                                                           14.   Access Control via Bucket Policies vs. IAM Policies  
                                                                                           15.   Bucket Tagging for Resource Management                                                                              
-   - Amazon EBS (Elastic Block Store)
-   - Amazon EFS (Elastic File System)
-   - AWS Glacier
-   - AWS Storage Gateway
+
+For Amazon EBS:
+1. Encryption of EBS Volumes
+2. Access Control via IAM Policies
+3. Volume Snapshot Permissions
+4. Volume Lifecycle Management Policies
+5. Data Encryption Key Management
+6. Monitoring for Unauthorized Volume Access
+7. Compliance with Service Limits
+8. Regular Volume Integrity Checks
+9. Backup and Restore Procedures
+10. Volume Access Logging and Analysis
+
+For Amazon EFS:
+1. Encryption of EFS File Systems
+2. Network Access Controls for EFS Mount Targets
+3. IAM Roles and Policies for EFS Access
+4. File-Level Permissions and ACLs
+5. Data Encryption Key Rotation
+6. Monitoring for Unauthorized File Access
+7. Compliance with Service Limits
+8. Regular File System Integrity Checks
+9. Backup and Restore Procedures
+10. File Access Logging and Analysis
+
+For AWS Glacier:
+1. Vault Access Controls
+2. Data Retrieval Policies
+3. Encryption of Archived Data
+4. Archive Inventory Management
+5. Monitoring for Unauthorized Glacier API Calls
+6. Compliance with Service Limits
+7. Regular Data Integrity Checks
+8. Vault Locking for Compliance
+9. Backup and Restore Procedures
+10. Audit Logging for Glacier Operations
+
+For AWS Storage Gateway:
+1. IAM Roles and Policies for Storage Gateway
+2. Access Control for Storage Gateway Resources
+3. Encryption of Data in Transit and at Rest
+4. Volume Snapshot Permissions
+5. Data Transfer Encryption Configuration
+6. Monitoring for Unauthorized Gateway Access
+7. Compliance with Service Limits
+8. Regular Gateway Health Checks
+9. Backup and Restore Procedures
+10. Audit Logging for Gateway Operations
 
 3. Database Services:
-   - Amazon RDS (Relational Database Service)
-   - Amazon DynamoDB
-   - Amazon Redshift
-   - Amazon Aurora
-   - Amazon ElastiCache
+   For Amazon RDS:
+1. Encryption of RDS Instances
+2. IAM Roles and Policies for RDS Access
+3. Network Access Controls via Security Groups
+4. Database Parameter Group Security
+5. Database Backup Encryption
+6. Monitoring for Unauthorized Database Access
+7. Compliance with Service Limits
+8. Regular Database Patching
+9. Database Activity Logging and Analysis
+10. Automated Backup and Restore Procedures
+
+For Amazon DynamoDB:
+1. IAM Roles and Policies for DynamoDB Access
+2. Table-level Access Controls
+3. Encryption of Data at Rest
+4. Encryption of Data in Transit
+5. Monitoring for Unauthorized DynamoDB Access
+6. Compliance with Service Limits
+7. Regular Data Integrity Checks
+8. Backup and Restore Procedures
+9. Fine-Grained Access Logging and Analysis
+10. Automated Scaling Policies
+
+For Amazon Redshift:
+1. Encryption of Redshift Clusters
+2. IAM Roles and Policies for Redshift Access
+3. Network Access Controls via VPC Security Groups
+4. Data Encryption Key Management
+5. Monitoring for Unauthorized Redshift Access
+6. Compliance with Service Limits
+7. Regular Cluster Health Checks
+8. Backup and Restore Procedures
+9. Query and User Activity Logging
+10. Automated Scaling Policies
+
+For Amazon Aurora:
+1. Encryption of Aurora Clusters
+2. IAM Roles and Policies for Aurora Access
+3. Network Access Controls via Security Groups
+4. Data Encryption Key Management
+5. Monitoring for Unauthorized Aurora Access -------------DONE
+6. Compliance with Service Limits -------------CONTINUE FROM HERE.
+7. Regular Cluster Health Checks
+8. Backup and Restore Procedures
+9. Query and User Activity Logging
+10. Automated Scaling Policies
+
+For Amazon ElastiCache:
+1. Encryption of ElastiCache Clusters
+2. IAM Roles and Policies for ElastiCache Access
+3. Network Access Controls via Security Groups
+4. Data Encryption Key Management
+5. Monitoring for Unauthorized ElastiCache Access
+6. Compliance with Service Limits
+7. Regular Cache Health Checks
+8. Backup and Restore Procedures
+9. Cache Access Logging and Analysis
+10. Automated Scaling Policies
 
 4. Networking Services:
-   - Amazon VPC (Virtual Private Cloud)
-   - Amazon Route 53
-   - AWS Direct Connect
-   - Amazon CloudFront
-   - AWS Global Accelerator
+
+ For Amazon VPC (Virtual Private Cloud):
+1. VPC Network Access Controls via Security Groups and Network ACLs
+2. Encryption of Data in Transit within the VPC
+3. VPC Flow Logs for Network Traffic Monitoring
+4. IAM Roles and Policies for VPC Resources
+5. Compliance with Service Limits and Best Practices
+6. Regular VPC Configuration Audits
+7. Automated VPC Peering Configuration
+8. Secure VPC Endpoint Configuration for AWS Services
+9. Automated VPC Backup and Restore Procedures
+10. Network Traffic Analysis for Anomalies and Intrusion Detection
+
+For Amazon Route 53:
+1. DNSSEC (Domain Name System Security Extensions) Configuration
+2. IAM Roles and Policies for Route 53 Access
+3. Route 53 Traffic Policies for Load Balancing and Routing Control
+4. DNS Query Logging and Analysis
+5. Compliance with DNS Best Practices and Security Standards
+6. Automated DNS Record Backup and Restore Procedures
+7. Monitoring for Unauthorized Route 53 Changes
+8. Health Checks and Failover Configuration for DNS Records
+9. Regular DNS Configuration Audits
+10. Integration with WAF (Web Application Firewall) for DNS Security
+
+For AWS Direct Connect:
+1. Encryption of Data in Transit over Direct Connect
+2. IAM Roles and Policies for Direct Connect Access
+3. Compliance with Direct Connect SLAs (Service Level Agreements)
+4. Monitoring for Anomalies in Direct Connect Traffic
+5. Secure Configuration of Direct Connect Virtual Interfaces
+6. Automated Failover and Redundancy Configuration
+7. Regular Direct Connect Configuration Audits
+8. Integration with IDS/IPS (Intrusion Detection/Prevention Systems)
+9. Data Loss Prevention Measures for Direct Connect Traffic
+10. Encryption Key Management for Direct Connect Connections
+
+For Amazon CloudFront:
+1. Encryption of Data in Transit via CloudFront Distributions
+2. IAM Roles and Policies for CloudFront Access
+3. CloudFront Access Logs for Monitoring and Analysis
+4. Secure Configuration of CloudFront Signed URLs and Signed Cookies
+5. Compliance with CDN Security Standards and Best Practices
+6. Automated CloudFront Distribution Configuration Audits
+7. Integration with WAF for Web Application Security
+8. DDoS (Distributed Denial of Service) Protection Configuration for CloudFront
+9. Secure Origin Access Control Configuration
+10. Regular CDN Security Assessments and Vulnerability Scanning
+
+For AWS Global Accelerator:
+1. Encryption of Data in Transit via Global Accelerator
+2. IAM Roles and Policies for Global Accelerator Access
+3. Traffic Flow Logging and Analysis
+4. Secure Configuration of Global Accelerator Endpoints
+5. Compliance with Global Accelerator SLAs
+6. Automated Global Accelerator Configuration Audits
+7. DDoS Protection Configuration for Global Accelerator
+8. Secure Origin Access Control Configuration
+9. Integration with WAF for Global Accelerator Traffic Security
+10. Regular Global Accelerator Security Assessments and Vulnerability Scanning
+
+
+
 
 5. Security, Identity, and Compliance:
    - AWS IAM (Identity and Access Management)
@@ -86,6 +278,9 @@ am#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
    - AWS Secrets Manager
    - Amazon GuardDuty
    - AWS WAF (Web Application Firewall)
+
+
+AWS networking services:
 
 
 
