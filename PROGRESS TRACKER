@@ -1,9 +1,42 @@
-am#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
+#IAM 25 MAIN CHECKPOINT COMPLETED ---------> DONE
 
+High Importance Functions:
+1. enforce_least_privilege
+2. enforce_password_policy
+3. review_iam_password_policy_complexity
+4. review_iam_role_trust_relationships
+5. review_iam_user_inline_policies
+6. review_unused_iam_permissions
+7. review_iam_policy_expiration_dates
+8. review_iam_role_session_policies
+9. review_iam_policy_size
+10. review_iam_service_linked_roles
+11. review_iam_policy_wildcard_usage
+12. review_iam_group_membership
+13. review_iam_role_policies_resource_specific
+14. review_iam_user_permissions_boundaries
 
+Medium Importance Functions:
+1. simulate_iam_policy
+2. analyze_iam_credential_report
+3. review_iam_cross_account_access
+4. review_iam_access_keys_rotation
+5. review_iam_groups_configuration
+6. review_iam_roles_sensitive_permissions
+7. review_iam_role_policies_resource_tagging
+8. review_iam_policies_unused_permissions
+9. review_iam_policy_versioning
+10. review_iam_role_permission_boundaries
+11. review_iam_user_mfa_status
+12. review_iam_policies_privilege_escalation
+13. review_iam_role_trust_relationships
+14. review_iam_policy_conditions
+15. review_iam_user_permissions_change_history
 
-
-                           ----------------DONE----------------
+Low Importance Functions:
+1. handle_api_exceptions
+2. log_result
+                         ----------------DONE----------------
 
 
 #23 CHECKPOINT PROVIDED HAS BEEN AUTOMATED ----------> DONE
