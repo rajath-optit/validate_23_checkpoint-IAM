@@ -21,16 +21,14 @@ def check_port_443_in_security_groups():
                         return f'\033[92m Yes, Applications should expose to public via port 443 only in security group: {group_name}.\033[0m'
     
     return '\033[91m No, no security group allows inbound traffic on port 443.\033[0m'
-port_range = entry.get('PortRange', {})
-print(f"  Port Range: {from_port} - {to_port}")
 
 result = check_port_443_in_security_groups()
 print(result)
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\033[94m 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.\033[0m")
 print(" This script will list all IAM users in the AWS account along with the policies attached to them (both attached and inline policies). However, determining the exact access level (e.g., 'Read' or 'Read/write') solely from the policy names would require additional analysis of the policy documents and possibly external context about the application and its requirements.")
@@ -71,9 +69,9 @@ def print_user_access_report():
             print(f"    - {policy}")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     print_user_access_report()
@@ -168,9 +166,9 @@ def main():
             print("\n \033[91m No, not all traffic from end users passes through AWS WAF and AWS Shield.\033[0m")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -197,9 +195,9 @@ def main():
     else:
         print("\033[91m No, applications are not enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.\033[0m")
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -238,9 +236,9 @@ def main():
         print("\033[91m No, application servers do not have specific security measures such as IPS/IDS and DDoS protection.\033[0m")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -269,9 +267,9 @@ def main():
         print("\033[91m No, Master - Slave Architecture is not set up for the DB.\033[0m")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -308,9 +306,9 @@ def main():
         print(" No managed database such as Amazon RDS, Amazon Aurora, or any other option is associated with this application.")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -349,9 +347,9 @@ def main():
         print("All EBS volumes are encrypted.\033[0m")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -394,9 +392,9 @@ def main():
         print("All S3 buckets are encrypted.")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -442,9 +440,9 @@ if __name__ == "__main__":
     main()
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\033[94m 11.Enable Cloud Trail for all AWS accounts.\033[0m")
 print("This script lists all AWS accounts in the AWS organization and checks if CloudTrail is enabled for each account. If CloudTrail is not enabled for an account, it adds the account ID to the list of accounts without CloudTrail. Finally, it prints whether CloudTrail is enabled for all AWS accounts or lists the accounts without CloudTrail if any are found.")
@@ -507,9 +505,9 @@ def main():
 if __name__ == "__main__":
     main()
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\033[94m 12.Enable Command Line Recorder (CLR) for all servers.\033[0m")
 print(" This script describes all managed instances in the AWS account using AWS Systems Manager (SSM) and checks if Command Line Recorder (CLR) is enabled for each instance. If CLR is not enabled for an instance, it adds the instance ID to the list of instances without CLR. Finally, it prints whether CLR is enabled for all servers or lists the servers without CLR if any are found.")
@@ -544,9 +542,9 @@ def main():
         print("\033[92m Command Line Recorder (CLR) is enabled for all servers.\033[0m")
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 if __name__ == "__main__":
     main()
@@ -584,9 +582,9 @@ if __name__ == "__main__":
     main()
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
     
 print("\033[94m 14. SSH to all Production resources should be limited to Bastion Host ONLY.\033[0m")
 print("------------------------------------------------------------------------------")
@@ -641,9 +639,9 @@ if __name__ == "__main__":
     main()
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\033[94m 15. MFA (Multi-Factor Authentication) to be enabled for SSH access to Bastion Host.\033[0m")
 print("--------------------------------------------------------------------------------------")
@@ -703,9 +701,9 @@ if __name__ == "__main__":
     main()
 
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\033[94m 16.MFA (Multi-Factor Authentication) to be enabled for SSH access to all Production Servers.\033[0m")
 print(" This code checks whether Multi-Factor Authentication (MFA) is enabled for SSH access to all IAM users and groups within an AWS account. It iterates over IAM users and groups, retrieves their attached policies, and examines these policies to determine if MFA is required for SSH access.")
@@ -759,9 +757,9 @@ def main():
     check_mfa_enabled()
 
 # Indicate that the check is completed
-    print("==" * 40 + "checked" + "==" * 40)
+    print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-    print("==" * 40 + "checked" + "==" * 40)
+    print("+#" * 40 + "checked" + "+#" * 40)
     
 if __name__ == "__main__":
     main()
@@ -813,9 +811,9 @@ def main():
             print("\033[91m Invalid input. Please enter 'yes' or 'no'.\033[0m")
 
 # Indicate that the check is completed
-    print("==" * 40 + "checked" + "==" * 40)
+    print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-    print("==" * 40 + "checked" + "==" * 40)
+    print("+#" * 40 + "checked" + "+#" * 40)
     
 if __name__ == "__main__":
     main()
@@ -875,31 +873,31 @@ def main():
 if __name__ == "__main__":
     main()
 # Indicate that the check is completed
-    print("==" * 40 + "checked" + "==" * 40)
+    print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-    print("==" * 40 + "checked" + "==" * 40)
+    print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\033[94m 19.Back Up configuration is a must for all Prod resources. Get confirmation from the customer on Backup frequency and retention period.\033[90m")
 print("\033[91m 'Back Up configuration' check, the script will indicate that it needs manual confirmation from the customer for backup frequency and retention period.\033[0m")
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("20.All resources should be in connected to Monitoring tool with Customer approved Thresholds.")
 print("\033[91m check, the script will indicate that it needs manual confirmation from the customer for backup frequency and retention period.\033[0m")
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("21.Have Monitoring tool covering all the critical instances, services, URL etc… Get confirmation from the customer on the coverage and alert receipents.")
 print("\033[91m check, the script will indicate that it needs manual confirmation from the customer for backup frequency and retention period.\033[0m")
 print("\033[91m--note: confirmation of monitoring coverage and alert recipients may not be possible directly through code because it involves interacting with client to gather confirmation. However,we have automated the process of checking if all critical instances, services, URLs, etc., are configured in the monitoring tool. After that, you can prompt the user to confirm the coverage and provide alert recipients manually\033[0m")
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\n\033[94m 22.Implement Log Aggregator tool covering all servers.\033[0m")
 print("Please note: This function partially automates the process of checking if a log aggregator tool is implemented covering all servers. It examines the configuration of log aggregation services like Amazon CloudWatch Logs or third-party tools like Elasticsearch, Splunk, etc. However, manual verification may still be required for certain resource types or configurations.")
@@ -957,9 +955,9 @@ def main():
 if __name__ == "__main__":
     main()
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 # Indicate that the check is completed
-print("==" * 40 + "checked" + "==" * 40)
+print("+#" * 40 + "checked" + "+#" * 40)
 
 print("\n\033[94m 23.Log Aggregator is recommended to be in Prod VPC on an individual instance, else cost is on high side if outside of Prod VPC.\033[0m")
 print("Please note: This function partially automates the process of checking if a log aggregator is recommended to be in the production VPC on an individual instance. It examines instance tags or other attributes to determine its location and if a log aggregator is recommended. However, manual verification may still be required for certain instances or configurations.")
