@@ -1,3 +1,4 @@
+
 import boto3
 
 # Define the ASCII art logo
@@ -15,7 +16,6 @@ logo = """
 											\__ \ (_| (_| | | | | | | |  __/ |     \ V /  __/ |  \__ \ | (_) | | | |_| || |_| | |_| |
 											|___/\___\__,_|_| |_|_| |_|\___|_|      \_/ \___|_|  |___/_|\___/|_| |_(_)_(_)___(_)___/ 
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘																						                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-  
 			  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 			  ║                        	║									   			  ║
 			  ║   GITHUB LINK           	║https://github.com/rajath-optit/validate_23_checkpoint-IAM/edit/main/final23checkpoint.py	  ║
@@ -442,57 +442,65 @@ if __name__ == "__main__":
 print("=" * 93)
 print("\n\n")
 
-print("\033[94m 9.Encrypt all S3 buckets.\033[0m")
-print("\033[96mThis script lists all S3 buckets in the AWS account and checks if they are encrypted. If any bucket is found to be unencrypted or does not have encryption settings configured, it adds the bucket name to the list of unencrypted buckets. Finally, it prints whether all S3 buckets are encrypted or lists the unencrypted buckets if any are found.\033[0m")
-def check_s3_encryption():
-    s3 = boto3.client('s3')
+# Option 9: Encrypt all S3 buckets
+def encrypt_all_s3_buckets():
+    print("\033[94m 9. Encrypt all S3 buckets.\033[0m")
+    print("\033[96mThis script lists all S3 buckets in the AWS account and checks if they are encrypted. If any bucket is found to be unencrypted or does not have encryption settings configured, it adds the bucket name to the list of unencrypted buckets. Finally, it prints whether all S3 buckets are encrypted or lists the unencrypted buckets if any are found.\033[0m")
 
-    # List all S3 buckets
-    response = s3.list_buckets()
+    def check_s3_encryption():
+        s3 = boto3.client('s3')
 
-    unencrypted_buckets = []
+        # List all S3 buckets
+        response = s3.list_buckets()
 
-    # Check encryption status for each bucket
-    for bucket in response['Buckets']:
-        bucket_name = bucket['Name']
+        unencrypted_buckets = []
 
-        # Get encryption configuration for the bucket
-        try:
-            encryption = s3.get_bucket_encryption(Bucket=bucket_name)
-            if 'ServerSideEncryptionConfiguration' not in encryption:
-                unencrypted_buckets.append(bucket_name)
-        except s3.exceptions.ClientError as e:
-            # If the bucket is not encrypted or does not have encryption settings configured
-            if e.response['Error']['Code'] == 'ServerSideEncryptionConfigurationNotFoundError':
-                unencrypted_buckets.append(bucket_name)
+        # Check encryption status for each bucket
+        for bucket in response['Buckets']:
+            bucket_name = bucket['Name']
 
-    return unencrypted_buckets
+            # Get encryption configuration for the bucket
+            try:
+                encryption = s3.get_bucket_encryption(Bucket=bucket_name)
+                if 'ServerSideEncryptionConfiguration' not in encryption:
+                    unencrypted_buckets.append(bucket_name)
+            except s3.exceptions.ClientError as e:
+                # If the bucket is not encrypted or does not have encryption settings configured
+                if e.response['Error']['Code'] == 'ServerSideEncryptionConfigurationNotFoundError':
+                    unencrypted_buckets.append(bucket_name)
 
-def main():
-    unencrypted_buckets = check_s3_encryption()
+        return unencrypted_buckets
 
-    # Print table header
-    print("=" * 90)
-    print("| {:<75} |".format("9. Encrypt all S3 buckets"))
-    print("-" * 90)
-    print("| {:<50} | {:<30} |".format("Bucket Name", "Encryption Status"))
-    print("=" * 90)
+    def main():
+        unencrypted_buckets = check_s3_encryption()
 
-    if unencrypted_buckets:
-        for bucket_name in unencrypted_buckets:
-            print("| {:<50} | {:<30} |".format(bucket_name, "Not Encrypted"))
-    else:
-        print("| {:<50} | {:<30} |".format("All buckets", "Encrypted"))
-        
-    # Print bottom border of the table
-    print("-" * 90)
-print("note:if it did not detect any s3 bucket running,the script considers everything is safe and encripted.")
+        print("note:if it did not detect any s3 bucket running, the script considers everything is safe and encrypted.")
+
+        # Print table header
+        print("=" * 90)
+        print("| {:<83} |".format("Bucket Encryption Status"))
+        print("-" * 90)
+        print("| {:<50} | {:<30} |".format("Bucket Name", "Encryption Status"))
+        print("=" * 90)
+
+        if unencrypted_buckets:
+            for bucket_name in unencrypted_buckets:
+                print("| {:<50} | {:<30} |".format(bucket_name, "Not Encrypted"))
+        else:
+            print("| {:<50} | {:<30} |".format("All buckets", "Encrypted"))
+
+        # Print bottom border of the table
+        print("-" * 90)
+
+    if __name__ == "__main__":
+        main()
+        # Print bottom border of the table
+        print("=" * 90)
+    print("\n\n")
 
 if __name__ == "__main__":
-    main()
-    # Print bottom border of the table
-    print("=" * 90)
-print("\n\n")
+    encrypt_all_s3_buckets()
+
 
 print("\033[94m 10.Enable versioning of all S3.\033[0m")
 print("\033[96mThis script lists all S3 buckets in the AWS account and checks if versioning is enabled for each bucket. If versioning is not enabled or not configured for a bucket, it adds the bucket name to the list of unversioned buckets. Finally, it prints whether all S3 buckets have versioning enabled or lists the unversioned buckets if any are found.\033[0m")
@@ -911,7 +919,7 @@ if __name__ == "__main__":
 print("=" * 90)
 print("\n\n")
 
-print("\033[94m 18.MFA (Multi-Factor Authentication) to be enabled for VPN access.\033[0m")
+print("\033[94m 18.MFA (Multi-Factor Authentication) to be enabled for VPN access.\033[0m")
 print("-" * 90)
 print("\033[96m The script checks if Multi-Factor Authentication (MFA) is enabled for VPN access. It prompts for the IAM user or role associated with VPN access, then examines attached IAM policies and groups to determine MFA status. If MFA is enabled, it prints 'MFA enabled for VPN access'; otherwise, it prints 'MFA not enabled for VPN 'access'.\033[0m")
 print("-" * 90)
