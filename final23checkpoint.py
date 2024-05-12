@@ -70,11 +70,11 @@ def check_port_443_in_security_groups():
 # Function to print the security group details in a table format
 def print_security_group_details(security_group_details):
     # Print the header for the table
-    print("=" * 93)
+    print("=" * 100)
     print("| {:<20} | {:<27} | {:<12} | {:<13} | {:<12} |".format(
         "Group Name", "Port 443 Exposed to Public", "Port Range", "CIDR Block", "Status"
     ))
-    print("=" * 93)
+    print("=" * 100)
 
     # Iterate over each security group detail and print it in the table format
     for detail in security_group_details:
@@ -83,10 +83,10 @@ def print_security_group_details(security_group_details):
         ))
 
     # Print the bottom border of the table
-    print("=" * 93)
+    print("=" * 100)
 
 # Print the purpose of the script
-print("\033[94m" + "=" * 93)
+print("\033[94m" + "=" * 100)
 print("\033[94m 1. Applications should only be exposed to the public via port 443.\033[0m")
 print("\033[96m note:This script checks all security groups in your AWS account to see if any allow inbound traffic on port 443 from any IP address. It confirms if port 443 is allowed in a security group, or returns a message indicating that it's not allowed.\033[0m")
 print("=" * 93 + "\033[0m")
@@ -478,7 +478,7 @@ def encrypt_all_s3_buckets():
 
         # Print table header
         print("=" * 90)
-        print("| {:<83} |".format("Bucket Encryption Status"))
+        print("| {:<86} |".format("Bucket Encryption Status"))
         print("-" * 90)
         print("| {:<50} | {:<30} |".format("Bucket Name", "Encryption Status"))
         print("=" * 90)
