@@ -264,9 +264,9 @@ def main():
     print("\nResult:")
     print("-------")
     if auto_scaling_enabled:
-        print("\033[92mYes\033[0m, applications are enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.")
+        print("\033[92mYes, applications are enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.\033[0m")
     else:
-        print("\033[91mNo\033[0m, applications are not enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.")
+        print("\033[91mNo, applications are not enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.\033[0m")
         print("No load balancer running/found.")
 
     # Print the bottom border of the result section
@@ -309,9 +309,9 @@ def main():
     print("-------")
     
     if security_enabled:
-        print("\033[92mYes\033[0m, application servers have some level of security measures such as IPS/IDS and DDoS protection.")
+        print("\033[92mYes, application servers have some level of security measures such as IPS/IDS and DDoS protection.\033[0m")
     else:
-        print("\033[91mNo\033[0m, application servers do not have specific security measures such as IPS/IDS and DDoS protection.")
+        print("\033[91mNo, application servers do not have specific security measures such as IPS/IDS and DDoS protection.\033[0m")
 
     # Print the bottom border of the result section
     print("=" * 93)
