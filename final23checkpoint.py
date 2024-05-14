@@ -1,4 +1,3 @@
-
 import boto3
 
 # Define the ASCII art logo
@@ -18,10 +17,10 @@ logo = """
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘																						                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 			  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 			  ║                        	║									   			  ║
-			  ║   GITHUB LINK           	║https://github.com/rajath-optit/validate_23_checkpoint-IAM/edit/main/final23checkpoint.py	  ║
-			  ║   Version          		║1.0.0								                         	  ║
-			  ║   Programming Language      ║Python								           			  ║
-			  ║   Command                   ║python3 final23checkpoint.py								  	  ║
+			  ║\033[96m   GITHUB LINK\033[0m           	║\033[91mhttps://github.com/rajath-optit/validate_23_checkpoint-IAM/edit/main/final23checkpoint.py\033[0m	  ║
+			  ║\033[96m   Version\033[0m          		║\033[91m1.0.0	\033[0m							                         	  ║
+			  ║\033[96m   Programming Language\033[0m      ║\033[91mPython\033[0m								           			  ║
+			  ║\033[96m   Command\033[0m                   ║\033[91mpython3 final23checkpoint.py\033[0m								  	  ║
 			  ║   		                ║									         		  ║
 			  ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 	"""
@@ -89,7 +88,7 @@ def print_security_group_details(security_group_details):
 print("\033[94m" + "=" * 100)
 print("\033[94m 1. Applications should only be exposed to the public via port 443.\033[0m")
 print("\033[96m note:This script checks all security groups in your AWS account to see if any allow inbound traffic on port 443 from any IP address. It confirms if port 443 is allowed in a security group, or returns a message indicating that it's not allowed.\033[0m")
-print("=" * 93 + "\033[0m")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 
 # Execute the function to check port 443 in security groups
 security_group_details = check_port_443_in_security_groups()
@@ -106,10 +105,12 @@ else:
     print("\n\033[91mResult: No security group allows inbound traffic on port 443.\033[0m")
 
 # Print the bottom border of the result section
-print("=" * 93)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 2.Enable the AWS access to the team as required . Developers should have least privileges access. (Read / Read/write / Root account). No need for Dev team to have access to AWS console.\033[0m")
+print("-" * 110)
 def list_iam_users():
     iam = boto3.client('iam')
     
@@ -151,7 +152,7 @@ if __name__ == "__main__":
     print_user_access_report()
     
 # Print the bottom border of the result section
-print("=" * 93)
+print("=" * 110)
 print("\n\n")
 
 print("\033[94m 3. All traffic from end user should pass the Perimeter Security Solutions such as WAF and AWS Shield.\033[0m")
@@ -193,11 +194,11 @@ def check_shield_enabled():
     return response['Subscription']['SubscriptionType'] == 'SHIELD_ADVANCED'
 
 def main():
-    print("------------------------------------------------------------------------------")
+    print("-" * 110)
     print(" Replace 'your_account_id', 'your_region', 'your_cloudfront_distribution_id', and 'your_load_balancer_id' with your actual AWS account ID, region, CloudFront distribution ID, and ALB ID respectively.")
-    print("------------------------------------------------------------------------------")
+    print("-" * 110)
     print("\033[96m note:This script first checks if either CloudFront distributions or ALBs are associated with the application. If so, it then proceeds to check if AWS WAF and AWS Shield are enabled for the respective resource. If neither CloudFront nor ALB is associated, it prints a message indicating that this checkpoint cannot be scanned.\033[0m")
-    print("------------------------------------------------------------------------------")
+    print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
     print("\nDo you want to check if all traffic from end users is passing through the Perimeter Security Solutions such as WAF and AWS Shield?")
     check_choice = input("(yes/no): ")
 
@@ -238,7 +239,8 @@ if __name__ == "__main__":
     main()
     
 # Print the bottom border of the result section
-print("=" * 93)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 def check_auto_scaling():
@@ -255,9 +257,9 @@ def check_auto_scaling():
 
 def main():
     print("\033[94m4. Applications should be enabled with Horizontal load balancers (Auto scaling) to meet the surge in traffic.\033[0m")
-    print("------------------------------------------------------------------------------")
+    print("-" * 110)
     print("\033[96mThis script checks if there are any auto scaling groups associated with your application. If auto scaling groups are found, it indicates that your application is enabled with horizontal load balancers (auto scaling) to meet the surge in traffic. Otherwise, it indicates that this requirement is not met.\033[0m")
-    print("------------------------------------------------------------------------------")
+    print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 
     auto_scaling_enabled = check_auto_scaling()
 
@@ -270,14 +272,17 @@ def main():
         print("No load balancer running/found.")
 
     # Print the bottom border of the result section
-    print("=" * 93)
+    print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 
 if __name__ == "__main__":
     main()
 print("\n\n")
 
 print("\033[94m 5.Application servers to be installed with IPS/IDS and DDoS (Examples for solution are - TrendMicro Deep Security).\033[0m")
+print("-" * 110)
 print("\033[96m This script checks the security groups associated with the application servers. If the security groups have rules allowing HTTP (port 80) or HTTPS (port 443) traffic and rules allowing all traffic (which might indicate DDoS protection), it assumes that some level of security measures similar to IPS/IDS and DDoS protection is in place. However, this is a simplified approach and may not cover all scenarios or accurately determine the presence of specific security software like TrendMicro Deep Security.\033[0m")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_security_groups():
     ec2 = boto3.client('ec2')
 
@@ -314,14 +319,17 @@ def main():
         print("\033[91mNo, application servers do not have specific security measures such as IPS/IDS and DDoS protection.\033[0m")
 
     # Print the bottom border of the result section
-    print("=" * 93)
+    print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 
 if __name__ == "__main__":
     main()
 print("\n\n")
 
 print("\033[94m 6.We should always have Master - Slave Architecture set up for DB.\033[0m")
+print("-" * 110)
 print("\033[96m This script checks all RDS DB instances in your AWS account and verifies if any of them have one or more read replicas. If read replicas are found, it indicates that a Master - Slave Architecture is set up for the database. Otherwise, it indicates that the requirement is not met.")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_db_replication():
     rds = boto3.client('rds')
 
@@ -347,7 +355,8 @@ def main():
         print("\033[91m No, Master - Slave Architecture is not set up for the DB.\033[0m")
 
     # Print the bottom border of the result section
-    print("=" * 93)
+    print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 
 if __name__ == "__main__":
     main()
@@ -355,9 +364,9 @@ print("\n\n")
 
 
 print("\033[94m7. We should always recommend to have Managed DB (Example print(RDS).\033[0m")
-print("------------------------------------------------------------------------------")
+print("-" * 110)
 print("\033[96mThis script iterates through the list of managed database options and checks for each one sequentially. If it finds any associated database, it returns True and prints the appropriate message. If none of the managed databases are found associated with the application, it prints a message indicating that no managed database is attached.\033[0m")
-print("------------------------------------------------------------------------------")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 
 def check_managed_db():
     # List of managed database options to check
@@ -398,14 +407,15 @@ if __name__ == "__main__":
     main()
     
 # Print the bottom border of the result section
-print("=" * 93)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 
 print("\033[94m 8.Encrypt all EBS volumes.\033[0m")
-print("------------------------------------------------------------------------------")
+print("-" * 110)
 print("\033[96mThis script describes all EBS volumes in the AWS account and checks if they are encrypted. If any volume is found to be unencrypted, it adds the volume ID to the list of unencrypted volumes. Finally, it prints whether all EBS volumes are encrypted or lists the unencrypted volumes if any are found.\033[0m")
-print("------------------------------------------------------------------------------")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_ebs_encryption():
     ec2 = boto3.client('ec2')
 
@@ -439,14 +449,17 @@ def main():
 if __name__ == "__main__":
     main()
 # Print the bottom border of the result section
-print("=" * 93)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 # Option 9: Encrypt all S3 buckets
 def encrypt_all_s3_buckets():
     print("\033[94m 9. Encrypt all S3 buckets.\033[0m")
+    print("-" * 110)
     print("\033[96mThis script lists all S3 buckets in the AWS account and checks if they are encrypted. If any bucket is found to be unencrypted or does not have encryption settings configured, it adds the bucket name to the list of unencrypted buckets. Finally, it prints whether all S3 buckets are encrypted or lists the unencrypted buckets if any are found.\033[0m")
-
+    print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
+	
     def check_s3_encryption():
         s3 = boto3.client('s3')
 
@@ -495,7 +508,8 @@ def encrypt_all_s3_buckets():
     if __name__ == "__main__":
         main()
         # Print bottom border of the table
-        print("=" * 90)
+        print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
     print("\n\n")
 
 if __name__ == "__main__":
@@ -503,7 +517,10 @@ if __name__ == "__main__":
 
 
 print("\033[94m 10.Enable versioning of all S3.\033[0m")
+print("-" * 110)
 print("\033[96mThis script lists all S3 buckets in the AWS account and checks if versioning is enabled for each bucket. If versioning is not enabled or not configured for a bucket, it adds the bucket name to the list of unversioned buckets. Finally, it prints whether all S3 buckets have versioning enabled or lists the unversioned buckets if any are found.\033[0m")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
+
 def check_s3_versioning():
     s3 = boto3.client('s3')
 
@@ -542,13 +559,14 @@ def main():
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 11.Enable Cloud Trail for all AWS accounts.\033[0m")
-print("------------------------------------------------------------------------------")
+print("-" * 110)
 print("\033[96mThis script lists all AWS accounts in the AWS organization and checks if CloudTrail is enabled for each account. If CloudTrail is not enabled for an account, it adds the account ID to the list of accounts without CloudTrail. Finally, it prints whether CloudTrail is enabled for all AWS accounts or lists the accounts without CloudTrail if any are found.\033[0m")
-print("------------------------------------------------------------------------------")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_aws_organizations():
     organizations = boto3.client('organizations')
     
@@ -608,11 +626,15 @@ def main():
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 12.Enable Command Line Recorder (CLR) for all servers.\033[0m")
+print("-" * 110)
 print("\033[96m This script describes all managed instances in the AWS account using AWS Systems Manager (SSM) and checks if Command Line Recorder (CLR) is enabled for each instance. If CLR is not enabled for an instance, it adds the instance ID to the list of instances without CLR. Finally, it prints whether CLR is enabled for all servers or lists the servers without CLR if any are found.\033[0m")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
+
 def check_clr_enabled():
     ssm = boto3.client('ssm')
 
@@ -646,13 +668,14 @@ def main():
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 13.We should always recommend to use dedicated VPC for Productions'Resources - All Prod servers should be in one VPC.\033[0m")
-print("-" * 90)
+print("-" * 110)
 print("\033[96mThis script describes all instances in the AWS account and checks if all instances tagged with the environment 'production' are in the same VPC. If all production servers are in the same VPC, it prints 'All production servers are in one VPC'.Otherwise, it prints 'Not all production servers are in one VPC.'.\033[0m")
-print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_production_servers_vpc():
     ec2 = boto3.client('ec2')
 
@@ -685,16 +708,17 @@ if __name__ == "__main__":
     main()
 
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
     
 print("\033[94m 14. SSH to all Production resources should be limited to Bastion Host ONLY.\033[0m")
-print("------------------------------------------------------------------------------")
+print("-" * 110)
 print("\033[96mThis script prompts the user to enter the IP address of the Bastion Host in CIDR notation.")
 print("It then checks if SSH inbound rules for production servers allow traffic only from this specified IP address.")
 print(" If SSH access is limited to the Bastion Host only, it prints 'SSH access to all production resources is limited to the Bastion Host ONLY.'")
 print("Otherwise, it prints 'SSH access to production resources is NOT limited to the Bastion Host ONLY.'\033[0m")
-print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_ssh_access(bastion_host_ip):
     ec2 = boto3.client('ec2')
 
@@ -738,18 +762,19 @@ def main():
     else:
         print("\033[91m SSH access to production resources is NOT limited to the Bastion Host ONLY.\033[0m")
         
-print("-" * 90)
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 
 print("\033[94m 15. MFA (Multi-Factor Authentication) to be enabled for SSH access to Bastion Host.\033[0m")
-print("--------------------------------------------------------------------------------------")
+print("-" * 110)
 print("\033[96m This script prompts the user to enter the name of the IAM user or role associated with the Bastion Host.")
 print(" It then checks if MFA is required for SSH access by examining the IAM policies attached to that user or role.\033[0m")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_mfa_enabled(bastion_host_name):
     iam = boto3.client('iam')
 
@@ -803,13 +828,14 @@ def main():
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 16.MFA (Multi-Factor Authentication) to be enabled for SSH access to all Production Servers.\033[0m")
-print("-" * 90)
+print("-" * 110)
 print("\033[96m This code checks whether Multi-Factor Authentication (MFA) is enabled for SSH access to all IAM users and groups within an AWS account. It iterates over IAM users and groups, retrieves their attached policies, and examines these policies to determine if MFA is required for SSH access.\033[0m")
-print("-" * 90)
+print("┌" + "-" * 54 + " " * 54 + "┐")
 def check_mfa_enabled():
     iam = boto3.client('iam')
 
@@ -862,13 +888,14 @@ def main():
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 17.Access to Bastion Host should be limited via VPN ONLY.\033[0m")
 print("-" * 90)
 print("\033[96m It verifies if access to a Bastion Host is restricted to a VPN. It asks for Bastion Host security group IDs, optionally allows manual input, and prompts for the VPN's IP range. Then, it checks if SSH access is restricted to the VPN's IP range\033[0m.")
-print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_vpn_access(vpn_ip_range, bastion_host_security_groups):
     ec2 = boto3.client('ec2')
     
@@ -888,7 +915,7 @@ def check_vpn_access(vpn_ip_range, bastion_host_security_groups):
     return True
 
 def main():
-    print("Do you want to manually input the security group IDs for the Bastion Host? (yes/no)")
+    print("1.Do you want to manually input the security group IDs for the Bastion Host? (yes/no): ")
     manual_input = input().lower()
     
     if manual_input == "yes":
@@ -898,7 +925,7 @@ def main():
         bastion_host_security_groups = ['sg-12345678', 'sg-87654321']  # Replace with your actual Bastion Host security group IDs
     
     while True:
-        response = input("Do you want to check if access to Bastion Host is limited via VPN ONLY? (yes/no): ")
+        response = input("2.Do you want to check if access to Bastion Host is limited via VPN ONLY? (yes/no): ")
         if response.lower() == 'no':
             print("Skipping the check for limiting access via VPN.")
             break
@@ -916,13 +943,14 @@ def main():
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 18.MFA (Multi-Factor Authentication) to be enabled for VPN access.\033[0m")
 print("-" * 90)
 print("\033[96m The script checks if Multi-Factor Authentication (MFA) is enabled for VPN access. It prompts for the IAM user or role associated with VPN access, then examines attached IAM policies and groups to determine MFA status. If MFA is enabled, it prints 'MFA enabled for VPN access'; otherwise, it prints 'MFA not enabled for VPN 'access'.\033[0m")
-print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_mfa_enabled(vpn_user_or_role):
     try:
         iam = boto3.client('iam')
@@ -977,36 +1005,41 @@ if __name__ == "__main__":
     main()
 
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m 19.Back Up configuration is a must for all Prod resources. Get confirmation from the customer on Backup frequency and retention period.\033[90m")
 print("-" * 90)
 print("\033[91m 'Back Up configuration' check, the script will indicate that it needs manual confirmation from the customer for backup frequency and retention period.\033[0m")
-print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m20.All resources should be in connected to Monitoring tool with Customer approved Thresholds.\033[0m")
 print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 print("\033[91m check, the script will indicate that it needs manual confirmation from the customer for backup frequency and retention period.\033[0m")
-print("-" * 90)
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\033[94m21.Have Monitoring tool covering all the critical instances, services, URL etc… Get confirmation from the customer on the coverage and alert receipents.\033[0m")
 print("\033[91m check, the script will indicate that it needs manual confirmation from the customer for backup frequency and retention period.\033[0m")
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 print("\033[91m--note: confirmation of monitoring coverage and alert recipients may not be possible directly through code because it involves interacting with client to gather confirmation. However,we have automated the process of checking if all critical instances, services, URLs, etc., are configured in the monitoring tool. After that, you can prompt the user to confirm the coverage and provide alert recipients manually\033[0m")
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 
 print("\n\033[94m 22.Implement Log Aggregator tool covering all servers.\033[0m")
 print("-" * 90)
 print("\033[96m Please note: This function partially automates the process of checking if a log aggregator tool is implemented covering all servers. It examines the configuration of log aggregation services like Amazon CloudWatch Logs or third-party tools like Elasticsearch, Splunk, etc. However, manual verification may still be required for certain resource types or configurations.\033[0m")
-print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_log_aggregator_tool():
     try:
         cloudwatch_logs_client = boto3.client('logs')
@@ -1056,16 +1089,19 @@ def main():
                 print("The Log Aggregator tool is NOT implemented.")
             break
         else:
-            print("Invalid input. Please enter 'yes' or 'no'.")
+            print("\033[91m Invalid input. Please enter 'yes' or 'no'.\033[0m")
 
 if __name__ == "__main__":
     main()
 
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
+print("\n\n")
 
 print("\n\033[94m 23.Log Aggregator is recommended to be in Prod VPC on an individual instance, else cost is on high side if outside of Prod VPC.\033[0m")
 print("-" * 90)
 print("\033[96mPlease note: This function partially automates the process of checking if a log aggregator is recommended to be in the production VPC on an individual instance. It examines instance tags or other attributes to determine its location and if a log aggregator is recommended. However, manual verification may still be required for certain instances or configurations.\033[0m")
-print("-" * 90)
+print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
 def check_log_aggregator_placement():
     ec2_client = boto3.client('ec2')
 
@@ -1097,12 +1133,13 @@ def main():
             check_log_aggregator_placement()
             break
         else:
-            print("\033[92m Invalid input. Please enter 'yes' or 'no'.\033[92m ")
+            print("\033[91m Invalid input. Please enter 'yes' or 'no'.\033[92m ")
 
 if __name__ == "__main__":
     main()
 # Print bottom border of the table
-print("=" * 90)
+print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+
 print("\n\n")
 # Indicate that the check is completed
 print("\033[94m__*\033[0m" * 30 + "Done" + "\033[94m__*\033[0m" * 30)
