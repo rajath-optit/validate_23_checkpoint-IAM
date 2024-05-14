@@ -835,7 +835,7 @@ print("\n\n")
 print("\033[94m 16.MFA (Multi-Factor Authentication) to be enabled for SSH access to all Production Servers.\033[0m")
 print("-" * 110)
 print("\033[96m This code checks whether Multi-Factor Authentication (MFA) is enabled for SSH access to all IAM users and groups within an AWS account. It iterates over IAM users and groups, retrieves their attached policies, and examines these policies to determine if MFA is required for SSH access.\033[0m")
-print("┌" + "-" * 54 + " " * 54 + "┐")
+print("┌" + "-" * 54 + "-" * 54 + "┐")
 def check_mfa_enabled():
     iam = boto3.client('iam')
 
