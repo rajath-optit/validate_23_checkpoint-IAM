@@ -1,4 +1,5 @@
 import boto3
+from prettytable import PrettyTable
 
 # Define the ASCII art logo
 logo = """
@@ -30,7 +31,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-
 def check_port_443_in_security_groups():
     # Initialize the AWS EC2 client
     ec2 = boto3.client('ec2')
@@ -42,12 +42,39 @@ def check_port_443_in_security_groups():
     security_group_details = []
 
     for group in response['SecurityGroups']:
+        group_id = group['GroupId']
         group_name = group['GroupName']
+        description = group.get('Description', 'N/A')
         permissions = group.get('IpPermissions', [])
         port_443_exposed = "No"
         port_range = "N/A-N/A"
         cidr_block = "N/A"
         status = "Not Allowed"
+        http_or_https = "N/A"
+        protocol = "N/A"
+        last_modified_time = "N/A"
+        instance_ids = "N/A"
+        tags = "N/A"
+
+        # Get the last modified time for the security group
+        try:
+            last_modified_time = group['Tags']['LastModified']
+        except KeyError:
+            pass
+
+        # Get the instance IDs associated with the security group
+        try:
+            instances = ec2.describe_instances(Filters=[{'Name': 'instance.group-id', 'Values': [group_id]}])
+            instance_ids = ', '.join([instance['InstanceId'] for reservation in instances['Reservations'] for instance in reservation['Instances']])
+        except:
+            pass
+
+        # Get the tags associated with the security group
+        try:
+            tags_response = ec2.describe_tags(Filters=[{'Name': 'resource-id', 'Values': [group_id]}])
+            tags = ', '.join(['{}:{}'.format(tag['Key'], tag['Value']) for tag in tags_response['Tags']])
+        except:
+            pass
         
         # Check if port 443 is allowed inbound for any CIDR block
         for permission in permissions:
@@ -59,36 +86,43 @@ def check_port_443_in_security_groups():
                         port_range = "443-443"
                         cidr_block = "0.0.0.0/0"
                         status = "Allowed"
+                        # Check if port 443 is used for HTTP or HTTPS
+                        if permission.get('IpProtocol') == 'tcp':
+                            protocol = "TCP"
+                            http_or_https = "HTTPS"
+                        elif permission.get('IpProtocol') == 'udp':
+                            protocol = "UDP"
+                            http_or_https = "HTTP"
+                        else:
+                            protocol = permission.get('IpProtocol')
                         break  # Once port 443 is found, break the loop
                 
         # Append the security group details to the list
-        security_group_details.append((group_name, port_443_exposed, port_range, cidr_block, status))
+        security_group_details.append([group_name, port_443_exposed, port_range, cidr_block, status, http_or_https, protocol, last_modified_time, instance_ids, tags, description])
     
     return security_group_details
 
 # Function to print the security group details in a table format
 def print_security_group_details(security_group_details):
-    # Print the header for the table
-    print("=" * 100)
-    print("| {:<20} | {:<27} | {:<12} | {:<13} | {:<12} |".format(
-        "Group Name", "Port 443 Exposed to Public", "Port Range", "CIDR Block", "Status"
-    ))
-    print("=" * 100)
-
-    # Iterate over each security group detail and print it in the table format
+    # Create a PrettyTable object
+    table = PrettyTable()
+    
+    # Define column names and alignment
+    table.field_names = ["Group Name", "Port 443 Exposed", "Port Range", "CIDR Block", "Status", "HTTP/HTTPS", "Protocol", "Last Modified Time", "Instance IDs", "Tags", "Description"]
+    table.align["Description"] = "l"  # Set alignment for the Description column to left
+    
+    # Add rows to the table
     for detail in security_group_details:
-        print("| {:<20} | {:<27} | {:<12} | {:<13} | {:<12} |".format(
-            *detail
-        ))
+        table.add_row(detail)
 
-    # Print the bottom border of the table
-    print("=" * 100)
+    # Print the table
+    print(table)
 
 # Print the purpose of the script
-print("\033[94m" + "=" * 100)
-print("\033[94m 1. Applications should only be exposed to the public via port 443.\033[0m")
-print("\033[96m note:This script checks all security groups in your AWS account to see if any allow inbound traffic on port 443 from any IP address. It confirms if port 443 is allowed in a security group, or returns a message indicating that it's not allowed.\033[0m")
-print("\033[93m┌" + "-" * 54 + "-" * 54 + "┐\033[0m")
+print("\033[94m" + "=" * 190)
+print("\033[94m 1. This script checks if port 443 is exposed to the public in AWS security groups.\033[0m")
+print("\033[96m Note: It scans all security groups to verify if inbound traffic on port 443 from any IP address is allowed.\033[0m")
+print("\033[93m┌" + "-" * 95 + "-" * 90 + "┐\033[0m")
 
 # Execute the function to check port 443 in security groups
 security_group_details = check_port_443_in_security_groups()
@@ -105,7 +139,7 @@ else:
     print("\n\033[91mResult: No security group allows inbound traffic on port 443.\033[0m")
 
 # Print the bottom border of the result section
-print("\033[93m└" + "-" * 54 + "-" * 54 + "┘\033[0m")
+print("\033[93m└" + "-" * 95 + "-" * 90 + "┘\033[0m")
 
 print("\n\n")
 
@@ -493,14 +527,14 @@ def encrypt_all_s3_buckets():
         print("=" * 90)
         print("| {:<86} |".format("Bucket Encryption Status"))
         print("-" * 90)
-        print("| {:<50} | {:<30} |".format("Bucket Name", "Encryption Status"))
+        print("| {:<50} | {:<33} |".format("Bucket Name", "Encryption Status"))
         print("=" * 90)
 
         if unencrypted_buckets:
             for bucket_name in unencrypted_buckets:
-                print("| {:<50} | {:<30} |".format(bucket_name, "Not Encrypted"))
+                print("| {:<50} | {:<33} |".format(bucket_name, "Not Encrypted"))
         else:
-            print("| {:<50} | {:<30} |".format("All buckets", "Encrypted"))
+            print("| {:<50} | {:<33} |".format("All buckets", "Encrypted"))
 
         # Print bottom border of the table
         print("-" * 90)
@@ -694,7 +728,6 @@ def check_production_servers_vpc():
 
     return len(vpcs) == 1
     
-print("-" * 90)
 
 def main():
     all_production_in_one_vpc = check_production_servers_vpc()
