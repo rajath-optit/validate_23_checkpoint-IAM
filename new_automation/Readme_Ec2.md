@@ -357,3 +357,636 @@ DEBUG=true ./aws-resource-manager.sh resources.csv
 
 ## Conclusion
 The AWS Resource Manager is a powerful tool for managing AWS resources at scale, providing automated security, compliance, and optimization capabilities. While it requires careful setup and maintenance, the benefits of automated resource management and security enforcement make it valuable for organizations managing AWS infrastructure.
+
+----------------extra:each fucntion----------------
+
+# Each Fucntion
+# AWS Security Functions Documentation
+
+# AWS EC2 Security Management Script Documentation
+
+## Overview
+This script is a comprehensive AWS EC2 security management tool that implements various security best practices and compliance checks for EC2 instances and related resources.
+
+## Key Components
+
+### 1. AMI Management (`handle_ami`)
+**Purpose**: Manages Amazon Machine Image (AMI) security settings
+- Ensures encryption is enabled
+- Verifies AMI age (< 90 days)
+- Restricts public access
+
+**Changes Made**:
+- Encrypts unencrypted AMIs
+- Modifies AMI permissions to restrict public access
+- Flags old AMIs for review
+
+**Advantages**:
+- Enhanced data security through encryption
+- Reduced attack surface by limiting public access
+- Better compliance through age management
+
+**Disadvantages**:
+- May increase storage costs due to encryption
+- Could impact deployment speed
+- Might break existing workflows dependent on public AMIs
+
+### 2. EBS Volume Management (`handle_ebs_volume`)
+**Purpose**: Manages EBS volume security settings
+- Ensures encryption is enabled
+- Sets DeleteOnTermination flag
+
+**Changes Made**:
+- Enables encryption for unencrypted volumes
+- Modifies volume attributes for automatic deletion
+
+**Advantages**:
+- Prevents data leakage
+- Reduces orphaned resource costs
+- Improves compliance
+
+**Disadvantages**:
+- May impact performance slightly
+- Could affect backup procedures
+- Might increase operational costs
+
+### 3. EC2 Instance Management (`handle_ec2_instance`)
+**Purpose**: Implements security best practices for EC2 instances
+- Enables detailed monitoring
+- Configures EBS optimization
+- Manages IAM profiles
+- Ensures VPC placement
+- Removes key pair dependencies
+
+**Changes Made**:
+- Enables CloudWatch detailed monitoring
+- Activates EBS optimization
+- Attaches IAM profiles
+- Modifies instance attributes
+- Removes key pairs
+
+**Advantages**:
+- Better visibility into instance behavior
+- Improved performance with EBS
+- Enhanced security through IAM roles
+- Better network isolation
+
+**Disadvantages**:
+- Increased monitoring costs
+- Higher instance costs for EBS optimization
+- Potential disruption during modifications
+
+### 4. IAM Role Security Checks
+**Purpose**: Prevents privilege escalation and unauthorized access
+- Checks for dangerous permissions
+- Prevents credential exposure
+- Limits resource modification capabilities
+
+**Changes Made**:
+- None (Read-only checks)
+- Raises alerts for non-compliant configurations
+
+**Advantages**:
+- Prevents security misconfigurations
+- Helps maintain least-privilege principle
+- Identifies potential vulnerabilities
+
+**Disadvantages**:
+- May generate false positives
+- Could require extensive IAM policy modifications
+- Might impact legitimate administrative tasks
+
+## Required IAM Permissions
+
+### Read Permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:Describe*",
+                "iam:GetRole",
+                "iam:ListRolePolicies",
+                "iam:ListAttachedRolePolicies",
+                "backup:ListBackupPlans",
+                "inspector2:ListFindings"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+### Write Permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:ModifyImageAttribute",
+                "ec2:ModifyInstanceAttribute",
+                "ec2:MonitorInstances",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ModifyVolumeAttribute",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+## Implementation Steps
+
+1. **Preparation**:
+   - Configure AWS CLI
+   - Set up required IAM roles
+   - Test script in non-production environment
+
+2. **Execution**:
+   ```bash
+   # Make script executable
+   chmod +x script.sh
+   
+   # Run with AWS profile
+   ./script.sh --profile your-aws-profile
+   ```
+
+3. **Monitoring**:
+   - Check CloudWatch Logs for script execution
+   - Review error messages
+   - Monitor resource modifications
+
+## Best Practices
+
+1. Always run in test environment first
+2. Enable logging for audit trails
+3. Schedule regular runs
+4. Review and update policies regularly
+5. Monitor costs after implementation
+6. Maintain backup procedures
+7. Document all modifications
+
+## Risk Mitigation
+
+1. Create resource backups before modifications
+2. Implement gradual rollout
+3. Maintain rollback procedures
+4. Monitor system performance
+5. Keep audit logs
+6. Test restoration procedures
+
+## Additional Considerations
+
+1. **Cost Impact**:
+   - Increased CloudWatch costs
+   - Higher storage costs for encryption
+   - Additional backup storage costs
+
+2. **Performance Impact**:
+   - Encryption overhead
+   - Monitoring overhead
+   - Additional API calls
+
+3. **Operational Impact**:
+   - Changed deployment procedures
+   - Modified backup processes
+   - Updated security procedures
+
+4. **Compliance Benefits**:
+   - Enhanced security posture
+   - Better audit capabilities
+   - Improved risk management
+---------> ---------> --------->
+## AMI Management Functions
+
+### handle_ami(ami_arn)
+- Main handler for AMI resources
+- Takes AMI ARN as input and manages encryption, age checks, and access restrictions
+- Coordinates calls to AMI-specific security functions
+
+### ensure_ami_encryption(ami_id)
+- Checks if AMI is encrypted
+- Encrypts unencrypted AMIs automatically
+- Modifies image attributes to restrict access to account
+
+### ensure_ami_age(ami_id)
+- Verifies AMI age is not older than 90 days
+- Issues warning if AMI exceeds age limit
+- Suggests deprecation for old AMIs
+
+### ensure_ami_public_access_restricted(ami_id)
+- Checks if AMI is publicly accessible
+- Makes public AMIs private automatically
+- Removes all public launch permissions
+
+## EBS Volume Management
+
+### handle_ebs_volume(volume_arn)
+- Main handler for EBS volumes
+- Manages encryption settings
+- Ensures proper deletion settings
+
+## EC2 Instance Management
+
+### handle_ec2_instance(instance_arn)
+- Primary EC2 instance handler
+- Coordinates multiple security checks
+- Manages monitoring, optimization, and security settings
+
+### ensure_detailed_monitoring(instance_id)
+- Enables detailed CloudWatch monitoring
+- Verifies monitoring status
+- Automatically enables if disabled
+
+### ensure_ebs_optimization(instance_id)
+- Checks EBS optimization status
+- Enables optimization if disabled
+- Improves storage performance
+
+### ensure_iam_profile(instance_id)
+- Verifies IAM profile attachment
+- Attaches default profile if missing
+- Ensures proper instance permissions
+
+### ensure_instance_in_vpc(instance_id)
+- Validates instance VPC placement
+- Reports error if instance is not in VPC
+- Ensures network isolation
+
+### ensure_no_key_pairs(instance_id)
+- Removes SSH key pairs
+- Disables API termination
+- Enhances instance security
+
+## VPN Endpoint Management
+
+### handle_vpn_endpoint(vpn_arn)
+- Manages Client VPN endpoints
+- Controls connection logging
+- Ensures security compliance
+
+### ensure_vpn_connection_logging(vpn_id)
+- Enables client connection logging
+- Configures CloudWatch log groups
+- Tracks VPN access
+
+## Security Compliance Functions
+
+### ensure_no_inspector_findings(instance_id)
+- Checks AWS Inspector results
+- Identifies high-severity findings
+- Reports security vulnerabilities
+
+### ensure_no_pass_role_lambda_invoke(instance_id)
+- Restricts IAM role permissions
+- Prevents pass role access
+- Limits Lambda function invocation
+
+### ensure_no_credentials_exposure(instance_id)
+- Prevents credential exposure
+- Checks IAM role policies
+- Removes risky permissions
+
+### ensure_no_s3_permissions_alteration(instance_id)
+- Restricts S3 permission changes
+- Protects critical configurations
+- Prevents unauthorized modifications
+
+### ensure_no_cloud_log_tampering(instance_id)
+- Prevents log manipulation
+- Protects audit trails
+- Maintains logging integrity
+
+### ensure_no_data_destruction_access(instance_id)
+- Prevents destructive actions
+- Protects against data loss
+- Limits deletion permissions
+
+### ensure_no_db_management_write_access(instance_id)
+- Restricts database modifications
+- Limits write access
+- Protects database integrity
+
+### ensure_no_defense_evasion_access(instance_id)
+- Prevents security bypass
+- Maintains defense mechanisms
+- Blocks evasion attempts
+
+### ensure_no_kms_destruction_access(instance_id)
+- Protects KMS resources
+- Prevents key deletion
+- Maintains encryption infrastructure
+
+### ensure_no_rds_destruction_access(instance_id)
+- Protects RDS resources
+- Prevents database deletion
+- Maintains database availability
+
+### ensure_no_eip_hijacking_access(instance_id)
+- Prevents IP address hijacking
+- Protects Elastic IPs
+- Maintains network security
+
+### ensure_no_management_level_access(instance_id)
+- Restricts administrative access
+- Limits management permissions
+- Enforces least privilege
+
+### ensure_no_group_creation_with_policy(instance_id)
+- Prevents unauthorized group creation
+- Restricts policy attachments
+- Controls IAM group management
+
+### ensure_no_role_creation_with_policy(instance_id)
+- Prevents unauthorized role creation
+- Restricts policy attachments
+- Controls IAM role management
+
+### ensure_no_user_creation_with_policy(instance_id)
+- Prevents unauthorized user creation
+- Restricts policy attachments
+- Controls IAM user management
+
+### ensure_no_org_write_access(instance_id)
+- Restricts organization changes
+- Protects organizational structure
+- Limits administrative access
+
+### ensure_no_privilege_escalation_access(instance_id)
+- Prevents privilege escalation
+- Maintains security boundaries
+- Limits permission expansion
+
+### ensure_no_sg_write_access(instance_id)
+- Restricts security group changes
+- Protects network security
+- Maintains firewall rules
+
+### ensure_no_resource_policy_write_access(instance_id)
+- Controls resource policy modifications
+- Protects resource configurations
+- Maintains access controls
+
+### ensure_no_s3_critical_config_write(instance_id)
+- Protects S3 configurations
+- Prevents critical changes
+- Maintains bucket security
+
+### ensure_no_write_level_access(instance_id)
+- Restricts write permissions
+- Enforces read-only access
+- Prevents unauthorized changes
+
+## Instance Configuration Management
+
+### ensure_no_launch_wizard_security_groups(instance_id)
+- Removes default security groups
+- Enforces custom security groups
+- Improves security posture
+
+### ensure_instance_not_older_than_180_days(instance_id)
+- Checks instance age
+- Flags old instances
+- Promotes instance refresh
+
+### ensure_no_public_ip_address(instance_id)
+- Removes public IP addresses
+- Enforces private networking
+- Improves security
+
+### ensure_no_multiple_enis(instance_id)
+- Limits network interfaces
+- Simplifies network architecture
+- Reduces attack surface
+
+### ensure_backup_plan_protection(instance_id)
+- Verifies backup coverage
+- Ensures data protection
+- Maintains business continuity
+
+### ensure_public_ec2_iam_profile(instance_id)
+- Checks public instance IAM profiles
+- Enforces proper permissions
+- Enhances security
+
+### ensure_termination_protection_enabled(instance_id)
+- Enables termination protection
+- Prevents accidental deletion
+- Protects critical instances
+
+### ensure_no_secrets_in_user_data(instance_id)
+- Scans user data for secrets
+- Prevents credential exposure
+- Maintains security hygiene
+
+### ensure_imdsv2_enabled(instance_id)
+- Enforces IMDSv2 usage
+- Improves metadata security
+- Prevents SSRF attacks
+
+### ensure_no_paravirtual_instances(instance_id)
+- Checks virtualization type
+- Prevents legacy instance types
+- Maintains modern infrastructure
+
+## Launch Template Management
+
+### ensure_no_public_ip_in_launch_template(launch_template_id)
+- Prevents public IP assignment
+- Enforces private networking
+- Maintains security in templates
+
+## Network Interface Management
+
+### ensure_unused_enis_removed()
+- Identifies unused ENIs
+- Promotes cleanup
+- Reduces costs
+
+## Instance Lifecycle Management
+
+### ensure_stopped_instances_removed_30_days()
+- Identifies stopped instances
+- Promotes resource cleanup
+- Maintains cost efficiency
+
+### ensure_stopped_instances_removed_90_days()
+- Identifies long-term stopped instances
+- Enforces instance cleanup
+- Reduces unused resources
+
+## Transit Gateway Management
+
+### ensure_auto_accept_shared_attachments_disabled()
+- Controls attachment acceptance
+- Prevents unauthorized connections
+- Maintains network security
+
+----------more detailed_each fucntion----------
+# AWS EC2 Security Compliance Checks Documentation
+
+## AMI Security Checks
+
+### 1. AMI Encryption Check
+**Function**: `ensure_ami_encryption`
+**Purpose**: Ensures Amazon Machine Images (AMIs) are encrypted
+**Changes Made**: 
+- Modifies AMI attributes to enable encryption
+- Adds launch permissions for account ID
+**Impact**: Enhanced data security at rest
+**Advantages**:
+- Prevents data exposure if AMI is shared/leaked
+- Complies with data protection regulations
+**Disadvantages**:
+- Slightly increased storage costs
+- Minor performance impact during instance launch
+
+### 2. AMI Age Verification
+**Function**: `ensure_ami_age`
+**Purpose**: Flags AMIs older than 90 days
+**Changes Made**: None (monitoring only)
+**Advantages**:
+- Ensures use of current, patched images
+- Reduces security vulnerabilities
+**Disadvantages**:
+- May require frequent AMI updates
+- Could impact existing deployment processes
+
+### 3. AMI Public Access Restriction
+**Function**: `ensure_ami_public_access_restricted`
+**Changes Made**: 
+- Removes public access permissions
+- Makes AMI private
+**Impact**: Prevents unauthorized AMI access
+**Advantages**:
+- Prevents accidental exposure
+- Controls AMI distribution
+**Disadvantages**:
+- Requires explicit sharing for collaboration
+- Additional overhead in AMI sharing management
+
+## EC2 Instance Configuration
+
+### 4. Detailed Monitoring
+**Function**: `ensure_detailed_monitoring`
+**Changes Made**: 
+- Enables detailed CloudWatch monitoring
+**Impact**: 1-minute metric intervals
+**Advantages**:
+- Better visibility into instance performance
+- Faster anomaly detection
+**Disadvantages**:
+- Additional CloudWatch costs
+- Increased metric storage
+
+### 5. EBS Optimization
+**Function**: `ensure_ebs_optimization`
+**Changes Made**: 
+- Enables EBS optimization flag
+**Impact**: Dedicated bandwidth for EBS
+**Advantages**:
+- Improved storage performance
+- Consistent I/O operations
+**Disadvantages**:
+- May not be available on all instance types
+- Additional instance costs
+
+### 6. IAM Profile Management
+**Function**: `ensure_iam_profile`
+**Changes Made**: 
+- Attaches IAM instance profile
+**Impact**: Enables AWS service access
+**Advantages**:
+- Secure AWS service access
+- No hard-coded credentials
+**Disadvantages**:
+- Requires IAM role management
+- Potential permission escalation if misconfigured
+
+### 7. VPC Requirement
+**Function**: `ensure_instance_in_vpc`
+**Changes Made**: None (verification only)
+**Impact**: Ensures network isolation
+**Advantages**:
+- Network isolation
+- Security group control
+**Disadvantages**:
+- VPC design complexity
+- Potential routing overhead
+
+## IAM Role Security
+
+### 8. Pass Role and Lambda Access
+**Function**: `ensure_no_pass_role_lambda_invoke`
+**Changes Made**: None (verification only)
+**Impact**: Prevents privilege escalation
+**Advantages**:
+- Prevents unauthorized role assumption
+- Limits Lambda function access
+**Disadvantages**:
+- May restrict legitimate automation
+- Requires careful permission planning
+
+[Documentation continues with detailed explanations for each security check...]
+
+## Best Practices Implementation
+
+### Instance Lifecycle Management
+
+1. **Termination Protection**
+**Function**: `ensure_termination_protection_enabled`
+**Changes Made**: 
+- Enables termination protection
+**Impact**: Prevents accidental instance deletion
+**Advantages**:
+- Prevents accidental termination
+- Protects critical instances
+**Disadvantages**:
+- Additional step when intentional termination needed
+- May complicate automation scripts
+
+### Network Security
+
+1. **Public IP Restrictions**
+**Function**: `ensure_no_public_ip_address`
+**Changes Made**: None (verification only)
+**Impact**: Ensures private network usage
+**Advantages**:
+- Reduces attack surface
+- Better network security
+**Disadvantages**:
+- Requires bastion/VPN for access
+- More complex network architecture
+
+[Documentation continues with remaining security checks...]
+
+## Usage Guidelines
+
+1. Review changes before implementation
+2. Test in non-production environment first
+3. Monitor for unintended impacts
+4. Maintain backup procedures
+5. Document exceptions and approvals
+
+## Implementation Risks
+
+1. Service interruption if misconfigured
+2. Potential access issues
+3. Application compatibility impacts
+4. Performance impacts
+5. Cost implications
+
+## Prerequisites
+
+1. AWS CLI configured
+2. Appropriate IAM permissions
+3. Backup procedures in place
+4. Change management process
+5. Testing environment available
+---------------------------------
+
