@@ -113,24 +113,36 @@ vol-0987654321fedcba0,ok
 - `resource`: Volume ID or ARN
 - `status`: Must be "alarm" for processing
 
-## Part 2: EC2 Security Compliance
+# Part 2: EC2 Security Compliance
 
-### Overview
+## Overview
 This section implements comprehensive security compliance checks and remediation for AWS EC2 resources including instances, AMIs, and related components. It enforces security best practices and compliance requirements through automated checks and modifications.
 
-### Core Components
+## Core Components
 
-#### 1. AMI Management (`handle_ami`)
+### 1. AMI Management (`handle_ami`)
 **Changes Made:**
 - Encrypts unencrypted AMIs
 - Restricts public access to AMIs
 - Flags AMIs older than 90 days
 
-**Use Case:**
-- Maintaining secure and compliant AMI inventory
-- Preventing data exposure through unencrypted or public AMIs
+**Implementation Details:**
+- Creates encrypted copies of unencrypted AMIs
+- Removes public access permissions
+- Makes AMIs private by default
+- Monitors AMI age against 90-day threshold
 
-#### 2. EC2 Instance Management (`handle_ec2_instance`)
+**Advantages:**
+- Enhanced data security through encryption
+- Reduced attack surface by limiting public access
+- Better compliance through age management
+
+**Disadvantages:**
+- May increase storage costs due to encryption
+- Could impact deployment speed
+- Might break existing workflows dependent on public AMIs
+
+### 2. EC2 Instance Management (`handle_ec2_instance`)
 **Changes Made:**
 - Enables detailed monitoring
 - Activates EBS optimization
@@ -138,9 +150,54 @@ This section implements comprehensive security compliance checks and remediation
 - Ensures VPC placement
 - Removes key pair associations
 
-#### 3. IAM Role Restrictions
+**Implementation Details:**
+- Configures CloudWatch detailed monitoring (1-minute intervals)
+- Sets up dedicated bandwidth for EBS operations
+- Attaches appropriate IAM profiles
+- Verifies instance placement in VPC
+- Removes SSH key pair dependencies
+
+**Advantages:**
+- Better visibility into instance behavior
+- Improved storage performance
+- Enhanced security through IAM roles
+- Better network isolation
+
+**Disadvantages:**
+- Increased monitoring costs
+- Higher instance costs for EBS optimization
+- Potential disruption during modifications
+
+### 3. Instance Configuration Security
 **Changes Made:**
-Multiple functions that check and restrict IAM role permissions, preventing:
+- Enables termination protection
+- Removes public IP addresses
+- Limits network interfaces
+- Enforces IMDSv2
+- Removes launch wizard security groups
+
+**Implementation Details:**
+- Activates protection against accidental termination
+- Enforces private networking
+- Controls ENI attachments
+- Implements metadata service v2
+- Replaces default security groups with custom ones
+
+### 4. Instance Lifecycle Management
+**Changes Made:**
+- Removes instances older than 180 days
+- Terminates stopped instances after 30/90 days
+- Enforces termination protection
+- Removes unused ENIs
+
+**Implementation Details:**
+- Monitors instance age and state
+- Implements automated cleanup procedures
+- Protects against accidental termination
+- Manages network interface lifecycle
+
+### 5. IAM Role Security
+**Restricted Actions:**
 - Pass role and Lambda invoke access
 - Credentials exposure
 - S3 permissions alteration
@@ -148,15 +205,11 @@ Multiple functions that check and restrict IAM role permissions, preventing:
 - Database management write access
 - KMS/RDS destruction access
 - Security group modifications
+- Management level access
+- Organization write access
+- Resource policy modifications
 
-#### 4. Instance Lifecycle Management
-**Changes Made:**
-- Removes instances older than 180 days
-- Terminates stopped instances after 30/90 days
-- Enforces termination protection
-- Removes unused ENIs
-
-### Required IAM Permissions
+## Required IAM Permissions
 ```json
 {
     "Version": "2012-10-17",
@@ -199,7 +252,7 @@ Multiple functions that check and restrict IAM role permissions, preventing:
 }
 ```
 
-### Implementation Steps
+## Implementation Steps
 1. **Preparation:**
    - Review and customize configuration parameters
    - Ensure AWS CLI is configured
@@ -218,7 +271,7 @@ Multiple functions that check and restrict IAM role permissions, preventing:
    - Execute script
    - Monitor for errors
 
-### Risk Considerations
+## Risk Considerations
 1. **Service Disruption:**
    - Script makes multiple resource modifications
    - Can impact running services
@@ -234,35 +287,56 @@ Multiple functions that check and restrict IAM role permissions, preventing:
    - Multiple API calls may cause throttling
    - Resource modifications may temporarily affect service
 
-### Troubleshooting
+## Troubleshooting
 
-#### Common Issues:
+### Common Issues:
 - API throttling
 - Permission denied errors
 - Resource state conflicts
 - Timeout issues
 
-#### Resolution Steps:
+### Resolution Steps:
 - Check IAM permissions
 - Verify resource states
 - Review AWS service limits
 - Check error logs
 
-### Maintenance
-1. **Regular Updates:**
-   - Review and update policies
-   - Check for new AWS features
-   - Update security requirements
-   - Test modifications
+## Additional Considerations
 
-2. **Monitoring:**
-   - Set up alerts
-   - Review logs regularly
-   - Monitor resource states
-   - Track costs
+### Backup and Recovery
+- Regular backup procedures
+- Recovery process documentation
+- Rollback plans
+- Testing restoration procedures
 
-3. **Documentation:**
-   - Keep change logs
-   - Update procedures
-   - Document exceptions
-   - Maintain runbooks
+### Compliance Benefits
+- Enhanced security posture
+- Better audit capabilities
+- Improved risk management
+- Regulatory compliance support
+
+### Performance Impact
+- Encryption overhead
+- Monitoring overhead
+- Additional API calls
+- Resource utilization changes
+
+### Cost Management
+- Monitor resource usage
+- Track operational costs
+- Review billing impacts
+- Optimize resource allocation
+
+## Not Available in Original Document
+- Detailed backup procedures
+- Specific compliance frameworks supported
+- Recovery time objectives (RTO)
+- Recovery point objectives (RPO)
+- Specific cost estimates
+- Performance benchmarks
+- Specific monitoring thresholds
+- Detailed incident response procedures
+- Integration with other AWS services
+- Custom script configurations
+- Third-party tool integrations
+- Regional-specific considerations
