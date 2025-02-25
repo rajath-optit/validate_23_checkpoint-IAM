@@ -1,5 +1,15 @@
 # [![AWS Toolbox header](./icons/github-header-image.png)](https://towardsthecloud.com)
 
+**[open-source collection of automation scripts that's now used by hundreds of cloud engineers.
+
+Want to delete all unused EIPs across your AWS accounts? There's a script for that.
+
+Need to clean up those pesky unattached EBS volumes? Got you covered.
+
+Managing CloudWatch log groups driving you crazy? I've built tools for that too.
+
+comprehensive toolkit with over 40 scripts for everyday AWS operations.]**
+
 # AWS Toolbox 🧰
 
 Scripts and tools for AWS cloud automation.
